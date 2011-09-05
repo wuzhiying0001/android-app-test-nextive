@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string
+    name="app_name">Android App Test</string>
+  <string
+    name="name">Name:</string>
+  <string
+    name="default_email">Default Recipient Email:</string>
+  <string
+    name="email">Email:</string>
+  <string
+    name="save">Save</string>
+  <string
+    name="pounds">Pounds</string>
+  <string
+    name="kilos">Kilograms</string>
+  <string
+    name="default_email_prompt">Choose a default recipient</string>
+  <string-array
+    name="default_email_array">
+    <item>Myself</item>
+    <item>Existing Contact</item>
+    <item>New Contact</item>
+  </string-array>
+</resources>
