@@ -4,11 +4,7 @@ import android.app.TabActivity;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
-import android.view.animation.AccelerateInterpolator;
-import android.view.animation.Animation;
-import android.view.animation.TranslateAnimation;
 import android.widget.TabHost;
-import android.widget.TabHost.OnTabChangeListener;
 
 public class HostActivity extends TabActivity {
 	/** Called when the activity is first created. */

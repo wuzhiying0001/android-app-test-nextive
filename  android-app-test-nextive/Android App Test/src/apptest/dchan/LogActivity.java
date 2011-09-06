@@ -2,21 +2,14 @@ package apptest.dchan;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.LinkedList;
-
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
-import android.content.ContentValues;
-import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.DatePicker;
-import android.widget.TextView;
 
 public class LogActivity  extends Activity implements OnClickListener{
     private Button mDateDisplay;
@@ -39,6 +32,7 @@ public class LogActivity  extends Activity implements OnClickListener{
             }
         };
     static final int DATE_DIALOG_ID = 0;
+	@Override
 	public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.log);
@@ -71,7 +65,8 @@ public class LogActivity  extends Activity implements OnClickListener{
 	                    .append(mDay).append("-")
 	                    .append(mYear).append(" "));
 	    }
-	 protected Dialog onCreateDialog(int id) {
+	 @Override
+	protected Dialog onCreateDialog(int id) {
 		    switch (id) {
 		    case DATE_DIALOG_ID:
 		    	Dialog  dialog=new DatePickerDialog(this, mDateSetListener, mYear, mMonth, mDay);
