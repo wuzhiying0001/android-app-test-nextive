@@ -97,4 +97,12 @@ public class DBHelper extends SQLiteOpenHelper
 		db.close();
 		return results;
 	}
+	
+	public static int deleteRow(Context c, int rowID)
+	{
+		DBHelper helper=new DBHelper(c, DBNAME, VERSION);
+		SQLiteDatabase db=helper.getWritableDatabase();
+		return db.delete(DATA_TABLE, UID+"="+rowID, null);
+	}
+	
 }

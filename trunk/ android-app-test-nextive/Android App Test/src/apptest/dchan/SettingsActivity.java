@@ -18,7 +18,7 @@ import android.widget.Spinner;
 public class SettingsActivity extends Activity implements
 		OnItemSelectedListener {
 	final private int PICK_CONTACT_REQUEST = 1;
-	final private int CREATE_CONTACT_REQUEST = 1;
+	final private int CREATE_CONTACT_REQUEST = 2;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -73,8 +73,7 @@ public class SettingsActivity extends Activity implements
 	}
 
 	@Override
-	public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2,
-			long arg3) {
+	public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
 		// TODO Auto-generated method stub
 		Resources res = getResources();
 		String[] planets = res.getStringArray(R.array.default_email_array);
