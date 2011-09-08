@@ -26,7 +26,7 @@ public class Preferences {
 		SharedPreferences settings=c.getSharedPreferences(PREF_FILE, Context.MODE_PRIVATE);
 		return settings.getString(UNIT, "");
 	}
-	public static boolean getFirstTime(Context c)
+	public static boolean isFirstTime(Context c)
 	{
 		SharedPreferences settings=c.getSharedPreferences(PREF_FILE, Context.MODE_PRIVATE);
 		return settings.getBoolean(FIRST, true);

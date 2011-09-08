@@ -13,9 +13,8 @@ public class HostActivity extends TabActivity {
     	super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
-        if(!Preferences.getFirstTime(this))
+        if(Preferences.isFirstTime(this))
         {
-        	Preferences.setFirstTime(this, false);
         	Intent intent = new Intent(this, SettingsActivity.class);        	
         	startActivity(intent);
         }
@@ -52,7 +51,7 @@ public class HostActivity extends TabActivity {
                       .setContent(intent);
         tabHost.addTab(spec);
         
-        tabHost.setCurrentTab(2);
+        tabHost.setCurrentTab(0);
         
 	}
     

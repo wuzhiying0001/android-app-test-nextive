@@ -22,4 +22,8 @@
     <item>Existing Contact</item>
     <item>New Contact</item>
   </string-array>
+  <string name="error">Error!</string>
+  <string name="name_missing">You forgot to enter a name!</string>
+  <string name="email_missing">You forgot to enter an email!</string>
+  <string name="ok">ok</string>
 </resources>

@@ -5,6 +5,7 @@ import java.util.Date;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -82,6 +83,7 @@ public class LogActivity  extends Activity implements OnClickListener{
 //		{
 //			Log.i(abc.getRowID()+"", abc.getWeightKGS()+" "+abc.getDate());
 //		}
+		
 		DBHelper.insertTimeWeight(this, new WeightTime(new Date(), asdf, WeightTime.KILOGRAM));
 		
         asdf++;
