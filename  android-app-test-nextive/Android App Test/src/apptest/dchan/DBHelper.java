@@ -102,7 +102,20 @@ public class DBHelper extends SQLiteOpenHelper
 	{
 		DBHelper helper=new DBHelper(c, DBNAME, VERSION);
 		SQLiteDatabase db=helper.getWritableDatabase();
-		return db.delete(DATA_TABLE, UID+"="+rowID, null);
+		int result=db.delete(DATA_TABLE, UID+"="+rowID, null);
+		db.close();
+		return result;
 	}
 	
+	public static int updateRow(Context c, int rowID, WeightTime weightTime)
+	{
+		DBHelper helper=new DBHelper(c, DBNAME, VERSION);
+		SQLiteDatabase db=helper.getWritableDatabase();
+		ContentValues cv=new ContentValues();
+		cv.put(DATE, weightTime.getDate().getTime());
+		cv.put(WEIGHT, weightTime.getWeightLB());
+		int result=db.update(DATA_TABLE, cv, UID+"="+rowID, null);
+		db.close();
+		return result;
+	}
 }

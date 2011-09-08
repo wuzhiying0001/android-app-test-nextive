@@ -1,6 +1,7 @@
 package apptest.dchan;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.database.Cursor;
@@ -27,6 +28,7 @@ public class SettingsActivity extends Activity implements OnItemSelectedListener
 	Button saveButton;
 	EditText nameEditText;
 	EditText emailEditText;
+	String defaultEmail;
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState)
@@ -46,6 +48,7 @@ public class SettingsActivity extends Activity implements OnItemSelectedListener
 		
 		nameEditText=(EditText)findViewById(R.id.nameEditText);
 		emailEditText=(EditText)findViewById(R.id.emailEditText);
+		
 	}
 
 	@Override
@@ -113,6 +116,7 @@ public class SettingsActivity extends Activity implements OnItemSelectedListener
 	@Override
 	public void onNothingSelected(AdapterView<?> arg0)
 	{
+		
 	}
 
 	@Override
@@ -121,10 +125,19 @@ public class SettingsActivity extends Activity implements OnItemSelectedListener
 		if(!emailEditText.getText().toString().equals("") && !nameEditText.getText().toString().equals(""))
 		{
 			savePreferences();
-			if(Preferences.getFirstTime(this))
+			if(Preferences.isFirstTime(this))
 			{
+				Preferences.setFirstTime(this, false);
 				finish();
 			}
+		}
+		else if(nameEditText.getText().toString().equals(""))
+		{
+			createError(R.string.email_missing);
+		}
+		else
+		{
+			createError(R.string.name_missing);
 		}
 	}
 	private void savePreferences()
@@ -132,5 +145,20 @@ public class SettingsActivity extends Activity implements OnItemSelectedListener
 		Preferences.setName(this, nameEditText.getText().toString());
 		Preferences.setEmail(this, emailEditText.getText().toString());
 		
+	}
+	@Override
+	public void onResume()
+	{
+		super.onResume();
+		nameEditText.setText(Preferences.getName(this));
+		emailEditText.setText(Preferences.getEmail(this));
+	}
+	private void createError(int resourceID)
+	{
+		AlertDialog.Builder errorMessage=new AlertDialog.Builder(this);
+		errorMessage.setTitle(R.string.error);
+		errorMessage.setMessage(resourceID);
+		errorMessage.setPositiveButton(R.string.ok, null);
+		errorMessage.show();
 	}
 }
