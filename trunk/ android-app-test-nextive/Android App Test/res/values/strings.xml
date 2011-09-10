@@ -26,4 +26,5 @@
   <string name="name_missing">You forgot to enter a name!</string>
   <string name="email_missing">You forgot to enter an email!</string>
   <string name="ok">ok</string>
+  <string name="weight_number">You must put a number for the weight!</string>
 </resources>

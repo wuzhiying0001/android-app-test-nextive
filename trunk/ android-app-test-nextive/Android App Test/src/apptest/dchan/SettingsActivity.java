@@ -17,6 +17,7 @@ import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RadioButton;
 import android.widget.Spinner;
 
 public class SettingsActivity extends Activity implements OnItemSelectedListener, OnClickListener
@@ -29,6 +30,8 @@ public class SettingsActivity extends Activity implements OnItemSelectedListener
 	EditText nameEditText;
 	EditText emailEditText;
 	String defaultEmail;
+	RadioButton kilograms;
+	RadioButton pounds;
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState)
@@ -48,6 +51,9 @@ public class SettingsActivity extends Activity implements OnItemSelectedListener
 		
 		nameEditText=(EditText)findViewById(R.id.nameEditText);
 		emailEditText=(EditText)findViewById(R.id.emailEditText);
+		
+		kilograms=(RadioButton)findViewById(R.id.optionsKilos);
+		pounds=(RadioButton)findViewById(R.id.optionsPounds);
 		
 	}
 
@@ -144,7 +150,14 @@ public class SettingsActivity extends Activity implements OnItemSelectedListener
 	{
 		Preferences.setName(this, nameEditText.getText().toString());
 		Preferences.setEmail(this, emailEditText.getText().toString());
-		
+		if(kilograms.isChecked())
+		{
+			Preferences.setUnit(this, WeightTime.KILOGRAM);
+		}
+		else
+		{
+			Preferences.setUnit(this, WeightTime.POUND);
+		}
 	}
 	@Override
 	public void onResume()
@@ -152,6 +165,16 @@ public class SettingsActivity extends Activity implements OnItemSelectedListener
 		super.onResume();
 		nameEditText.setText(Preferences.getName(this));
 		emailEditText.setText(Preferences.getEmail(this));
+		if(Preferences.getUnit(this).equals(WeightTime.KILOGRAM))
+		{
+			kilograms.setChecked(true);
+			pounds.setChecked(false);
+		}
+		else
+		{
+			kilograms.setChecked(false);
+			pounds.setChecked(true);
+		}
 	}
 	private void createError(int resourceID)
 	{

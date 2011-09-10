@@ -52,12 +52,12 @@ public class WeightTime {
 		}
 		weight = _weight;
 	}
-	private double lbsToKgs(double lbs)
+	public static double lbsToKgs(double lbs)
 	{
-		return lbs/2.2;
+		return lbs*.45359237;
 	}
-	private double kgsToLbs(double kgs)
+	public static double kgsToLbs(double kgs)
 	{
-		return kgs*2.2;
+		return kgs*2.20452262;
 	}
 }

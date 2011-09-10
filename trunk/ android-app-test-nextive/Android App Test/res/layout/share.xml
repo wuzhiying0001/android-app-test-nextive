@@ -9,31 +9,28 @@
     android:id="@+id/widget1"
     android:layout_width="fill_parent"
     android:layout_height="match_parent">
+
     <TextView
-      android:textAppearance="?android:attr/textAppearanceLarge"
       android:layout_height="wrap_content"
-      android:layout_width="wrap_content"
-      android:text="@string/name"
+      android:textAppearance="?android:attr/textAppearanceLarge"
+      android:text="TextView"
       android:id="@+id/textView1"
-      android:layout_alignParentTop="true"
-      android:layout_alignParentLeft="true">
-    </TextView>
-    <EditText
-      android:layout_height="wrap_content"
-      android:layout_width="fill_parent"
-      android:id="@+id/nameEditText"
-      android:inputType="textPersonName"
-      android:layout_below="@+id/textView1"
-      android:layout_alignParentLeft="true">
-    </EditText>
-    <TextView
-      android:textAppearance="?android:attr/textAppearanceLarge"
-      android:layout_height="wrap_content"
       android:layout_width="wrap_content"
-      android:text="@string/email"
+      android:layout_below="@+id/date_range"
+      android:layout_alignParentLeft="true"></TextView>
+    <TextView
+      android:layout_height="wrap_content"
+      android:textAppearance="?android:attr/textAppearanceLarge"
+      android:text="TextView"
       android:id="@+id/textView2"
-      android:layout_below="@+id/nameEditText"
-      android:layout_alignParentLeft="true">
-    </TextView>
+      android:layout_width="wrap_content"
+      android:layout_alignTop="@+id/textView1"
+      android:layout_alignParentRight="true"></TextView>
+    <SeekBar
+      android:id="@+id/seekBar1"
+      android:layout_height="wrap_content"
+      android:layout_width="match_parent"
+      android:layout_below="@+id/textView1"
+      android:layout_alignParentLeft="true"></SeekBar>
   </RelativeLayout>
 </ScrollView>

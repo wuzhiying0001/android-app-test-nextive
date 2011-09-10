@@ -17,35 +17,26 @@
       android:layout_alignParentLeft="true">
     </Button>
     <Button
-      android:text="Button"
+      android:text="@string/save"
       android:layout_height="wrap_content"
       android:layout_width="wrap_content"
       android:id="@+id/saveButton"
       android:layout_alignParentBottom="true"
       android:layout_alignParentRight="true"></Button>
-    <Button
-      android:text="Button"
-      android:layout_height="wrap_content"
-      android:layout_width="wrap_content"
-      android:id="@+id/button1"
-      android:layout_below="@+id/dateDisplay"
-      android:layout_alignParentLeft="true"></Button>
     <EditText
       android:layout_height="wrap_content"
+      android:id="@+id/weightEditText"
+      android:inputType="numberDecimal"
       android:layout_width="wrap_content"
-      android:id="@+id/editText1"
-      android:inputType="number"
-      android:layout_alignBottom="@+id/button1"
-      android:layout_toRightOf="@+id/button1">
-      <requestFocus></requestFocus>
-    </EditText>
-    <Button
-      android:text="Button"
+      android:layout_below="@+id/dateDisplay"
+      android:layout_alignRight="@+id/dateDisplay"
+      android:layout_alignParentLeft="true"></EditText>
+    <SeekBar
+      android:id="@+id/weightSeekBar"
       android:layout_height="wrap_content"
-      android:layout_width="wrap_content"
-      android:id="@+id/button2"
-      android:layout_alignBottom="@+id/editText1"
-      android:layout_toRightOf="@+id/editText1"></Button>
+      android:layout_width="match_parent"
+      android:layout_below="@+id/weightEditText"
+      android:layout_alignParentLeft="true"></SeekBar>
 
   </RelativeLayout>
 </ScrollView>

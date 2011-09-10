@@ -12,6 +12,7 @@ public class Preferences {
 	public final static String DEFAULT_RECIPIENT_EMAIL="DEFAULT_RECIPIENT_EMAIL";
 	public final static String FIRST="FIRST";
 	
+	
 	private final static String PREF_FILE="file";
 	
 	public static void setUnit(Context c, String unit)
@@ -24,7 +25,7 @@ public class Preferences {
 	public static String getUnit(Context c)
 	{
 		SharedPreferences settings=c.getSharedPreferences(PREF_FILE, Context.MODE_PRIVATE);
-		return settings.getString(UNIT, "");
+		return settings.getString(UNIT, WeightTime.KILOGRAM);
 	}
 	public static boolean isFirstTime(Context c)
 	{
@@ -62,5 +63,16 @@ public class Preferences {
 		SharedPreferences settings=c.getSharedPreferences(PREF_FILE, Context.MODE_PRIVATE);
 		return settings.getString(EMAIL, "");
 	}
-	
+	public static void setLastWeight(Context c, double weight)
+	{
+		SharedPreferences settings=c.getSharedPreferences(PREF_FILE, Context.MODE_PRIVATE);
+		SharedPreferences.Editor editor=settings.edit();
+		editor.putFloat(LAST_WEIGHT, (float) weight);
+		editor.commit();
+	}
+	public static double getLastWeight(Context c)
+	{
+		SharedPreferences settings=c.getSharedPreferences(PREF_FILE, Context.MODE_PRIVATE);
+		return settings.getFloat(LAST_WEIGHT, 150);
+	}
 }
