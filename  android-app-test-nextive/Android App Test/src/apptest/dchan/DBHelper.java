@@ -58,7 +58,7 @@ public class DBHelper extends SQLiteOpenHelper
 		SQLiteDatabase db=helper.getWritableDatabase();
 		ContentValues cv=new ContentValues();
 		cv.put(DATE, weightTime.getDate().getTime());
-		cv.put(WEIGHT, weightTime.getWeightLB());
+		cv.put(WEIGHT, weightTime.getWeightKG());
 		long result=db.insertOrThrow(DATA_TABLE, null, cv);
 		db.close();
 		return result;

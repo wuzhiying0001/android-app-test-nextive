@@ -1,5 +1,8 @@
 package apptest.dchan;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.LinkedList;
 
 import android.app.Activity;
@@ -51,8 +54,8 @@ public class HistoryActivity extends Activity
 			TextView date = new TextView(this);
 			date.setTextAppearance(this, android.R.style.TextAppearance_Medium);
 			date.setGravity(Gravity.LEFT);
-			date.setText(aRow.getDate().toLocaleString());
-
+			SimpleDateFormat formatter=new SimpleDateFormat("MMMMM d, yyyy");
+			date.setText(formatter.format(aRow.getDate()));
 			TextView weight = new TextView(this);
 			weight.setTextAppearance(this, android.R.style.TextAppearance_Medium);
 			weight.setGravity(Gravity.RIGHT);
@@ -75,8 +78,8 @@ public class HistoryActivity extends Activity
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo)
 	{
-		// menu.setHeaderTitle("Sample menu");
 		super.onCreateContextMenu(menu, v, menuInfo);
+		menu.setHeaderTitle("Action menu");
 		menu.add(0, MODIFY_ACTION, 0, "Modify");
 		menu.add(0, DELETE_ACTION, 1, "Delete");
 		clickedOnView = v;

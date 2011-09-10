@@ -1,37 +1,36 @@
 package apptest.dchan;
 
+import java.text.DecimalFormat;
+import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.EditText;
+import android.widget.SeekBar;
+import android.widget.SeekBar.OnSeekBarChangeListener;
 
 public class LogActivity  extends Activity implements OnClickListener{
     private Button mDateDisplay;
     private Button mSave;
+    private SeekBar mWeightSeekbar;
+    private EditText mWeightText;
     private int mYear;
     private int mMonth;
     private int mDay;
-    
-    int asdf;
-    
-    private DatePickerDialog.OnDateSetListener mDateSetListener =
-        new DatePickerDialog.OnDateSetListener() {
-
-            public void onDateSet(DatePicker view, int year, 
-                                  int monthOfYear, int dayOfMonth) {
-                mYear = year;
-                mMonth = monthOfYear;
-                mDay = dayOfMonth;
-                updateDisplay();
-            }
-        };
+        
+    private DatePickerDialog.OnDateSetListener mDateSetListener;
+        
     static final int DATE_DIALOG_ID = 0;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -39,8 +38,24 @@ public class LogActivity  extends Activity implements OnClickListener{
         setContentView(R.layout.log);
         mDateDisplay = (Button) findViewById(R.id.dateDisplay);
         mSave = (Button) findViewById(R.id.saveButton);
+        mWeightText=(EditText)findViewById(R.id.weightEditText);
+        mWeightSeekbar=(SeekBar)findViewById(R.id.weightSeekBar);
+        mWeightSeekbar.setMax(4000);
+        mWeightSeekbar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
+			
+			@Override
+			public void onStopTrackingTouch(SeekBar seekBar) {}
+			
+			@Override
+			public void onStartTrackingTouch(SeekBar seekBar) {}
+			
+			@Override
+			public void onProgressChanged(SeekBar seekBar, int progress,
+					boolean fromUser) {
+				mWeightText.setText(progress/10.0+"");
+			}
+		});
         
-        asdf=1;
         mSave.setOnClickListener(this);
         
         // add a click listener to the button
@@ -57,6 +72,17 @@ public class LogActivity  extends Activity implements OnClickListener{
 
         // display the current date (this method is below)
         updateDisplay();
+        
+        new DatePickerDialog.OnDateSetListener() {
+
+            public void onDateSet(DatePicker view, int year, 
+                                  int monthOfYear, int dayOfMonth) {
+                mYear = year;
+                mMonth = monthOfYear;
+                mDay = dayOfMonth;
+                updateDisplay();
+            }
+        };
     }
 	 private void updateDisplay() {
 	        mDateDisplay.setText(
@@ -78,14 +104,39 @@ public class LogActivity  extends Activity implements OnClickListener{
 		}
 	@Override
 	public void onClick(View v) {
-//		LinkedList<WeightTime> aa=DBHelper.getWeightTime(this, null, null);
-//		for(WeightTime abc:aa)
-//		{
-//			Log.i(abc.getRowID()+"", abc.getWeightKGS()+" "+abc.getDate());
-//		}
-		
-		DBHelper.insertTimeWeight(this, new WeightTime(new Date(), asdf, WeightTime.KILOGRAM));
-		
-        asdf++;
+		try
+		{
+			double weight=Double.parseDouble(mWeightText.getText().toString());
+			Date d=new Date(mYear-1900, mMonth, mDay);
+			WeightTime wt=new WeightTime(d, weight, Preferences.getUnit(this));
+			DBHelper.insertTimeWeight(this, wt);
+			
+			Preferences.setLastWeight(this, wt.getWeightKG());
+		}
+		catch(NumberFormatException e)
+		{
+			createError(R.string.weight_number);
+		}
+	}
+	private void createError(int resourceID)
+	{
+		AlertDialog.Builder errorMessage=new AlertDialog.Builder(this);
+		errorMessage.setTitle(R.string.error);
+		errorMessage.setMessage(resourceID);
+		errorMessage.setPositiveButton(R.string.ok, null);
+		errorMessage.show();
+	}
+	@Override
+	public void onResume()
+	{
+		super.onResume();
+		double lastWeight=Preferences.getLastWeight(this);
+		if(Preferences.getUnit(this).equals(WeightTime.POUND))
+		{
+			lastWeight=WeightTime.kgsToLbs(lastWeight);
+		}
+		DecimalFormat maxDigitsFormatter = new DecimalFormat("#.#");
+		mWeightText.setText(maxDigitsFormatter.format((lastWeight)));
+		mWeightSeekbar.setProgress((int) (lastWeight*10));
 	}
 }
