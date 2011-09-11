@@ -37,6 +37,14 @@
       android:layout_width="match_parent"
       android:layout_below="@+id/weightEditText"
       android:layout_alignParentLeft="true"></SeekBar>
+    <Button
+      android:id="@+id/cancel"
+      android:layout_width="wrap_content"
+      android:text="@string/cancel"
+      android:layout_height="wrap_content"
+      android:layout_alignParentBottom="true"
+      android:layout_alignParentLeft="true"
+      android:visibility="invisible"></Button>
 
   </RelativeLayout>
 </ScrollView>
