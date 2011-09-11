@@ -1,6 +1,7 @@
 package apptest.dchan;
 
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.LinkedList;
 
 import android.content.ContentValues;
@@ -52,12 +53,12 @@ public class DBHelper extends SQLiteOpenHelper
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion)
 	{
 	}
-	public static long insertTimeWeight(Context c, WeightTime weightTime)
+	public static long insertRow(Context c, WeightTime weightTime)
 	{
 		DBHelper helper=new DBHelper(c, DBNAME, VERSION);
 		SQLiteDatabase db=helper.getWritableDatabase();
 		ContentValues cv=new ContentValues();
-		cv.put(DATE, weightTime.getDate().getTime());
+		cv.put(DATE, weightTime.getDate().getTimeInMillis());
 		cv.put(WEIGHT, weightTime.getWeightKG());
 		long result=db.insertOrThrow(DATA_TABLE, null, cv);
 		db.close();
@@ -71,6 +72,7 @@ public class DBHelper extends SQLiteOpenHelper
 		SQLiteDatabase db=helper.getReadableDatabase();
 		String[] columns={UID, DATE, WEIGHT};
 		String selection="";
+		
 		if(startDate!=null)
 		{
 			selection=selection+DATE+">"+startDate.getTime()+" ";
@@ -83,14 +85,15 @@ public class DBHelper extends SQLiteOpenHelper
 		{
 			selection=selection+DATE+">"+startDate.getTime()+" ";
 		}
+		
 		Cursor cursor=db.query(DATA_TABLE, columns, selection, null, null, null, DATE);
-		cursor.getCount();
 		while(cursor.moveToNext())
 		{
-			Date date=new Date(cursor.getLong(cursor.getColumnIndexOrThrow(DATE)));
-			double weight=cursor.getDouble(cursor.getColumnIndex(WEIGHT));
-			WeightTime wt=new WeightTime(date, weight, WeightTime.KILOGRAM);
-			wt.setRowID(cursor.getInt(cursor.getColumnIndex(UID)));
+			GregorianCalendar date=new GregorianCalendar();
+			date.setTimeInMillis(cursor.getLong(cursor.getColumnIndexOrThrow(DATE)));
+			float weight=cursor.getFloat(cursor.getColumnIndex(WEIGHT));
+			int rowNum=cursor.getInt(cursor.getColumnIndex(UID));
+			WeightTime wt=new WeightTime(date, weight, WeightTime.KILOGRAM, rowNum);
 			results.addLast(wt);
 		}
 		cursor.close();
@@ -112,10 +115,28 @@ public class DBHelper extends SQLiteOpenHelper
 		DBHelper helper=new DBHelper(c, DBNAME, VERSION);
 		SQLiteDatabase db=helper.getWritableDatabase();
 		ContentValues cv=new ContentValues();
-		cv.put(DATE, weightTime.getDate().getTime());
+		cv.put(DATE, weightTime.getDate().getTimeInMillis());
 		cv.put(WEIGHT, weightTime.getWeightLB());
 		int result=db.update(DATA_TABLE, cv, UID+"="+rowID, null);
 		db.close();
 		return result;
+	}
+	
+	public static WeightTime getRow(Context c, int rowID)
+	{
+		WeightTime returnItem=null;
+		DBHelper helper=new DBHelper(c, DBNAME, VERSION);
+		SQLiteDatabase db=helper.getReadableDatabase();
+		String[] columns={UID, DATE, WEIGHT};
+		String selection=UID+"="+rowID;
+		Cursor cursor=db.query(DATA_TABLE, columns, selection, null, null, null, DATE);
+		while(cursor.moveToNext())
+		{
+			GregorianCalendar date=new GregorianCalendar();
+			date.setTimeInMillis(cursor.getLong(cursor.getColumnIndexOrThrow(DATE)));
+			float weight=cursor.getFloat(cursor.getColumnIndex(WEIGHT));
+			returnItem=new WeightTime(date, weight, WeightTime.KILOGRAM, rowID);
+		}
+		return returnItem;
 	}
 }

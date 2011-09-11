@@ -63,14 +63,14 @@ public class Preferences {
 		SharedPreferences settings=c.getSharedPreferences(PREF_FILE, Context.MODE_PRIVATE);
 		return settings.getString(EMAIL, "");
 	}
-	public static void setLastWeight(Context c, double weight)
+	public static void setLastWeight(Context c, float weight)
 	{
 		SharedPreferences settings=c.getSharedPreferences(PREF_FILE, Context.MODE_PRIVATE);
 		SharedPreferences.Editor editor=settings.edit();
-		editor.putFloat(LAST_WEIGHT, (float) weight);
+		editor.putFloat(LAST_WEIGHT, weight);
 		editor.commit();
 	}
-	public static double getLastWeight(Context c)
+	public static float getLastWeight(Context c)
 	{
 		SharedPreferences settings=c.getSharedPreferences(PREF_FILE, Context.MODE_PRIVATE);
 		return settings.getFloat(LAST_WEIGHT, 150);

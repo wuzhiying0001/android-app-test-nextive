@@ -2,8 +2,11 @@ package apptest.dchan;
 
 import java.text.DecimalFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
@@ -21,13 +24,11 @@ import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 
 public class LogActivity  extends Activity implements OnClickListener{
-    private Button mDateDisplay;
-    private Button mSave;
-    private SeekBar mWeightSeekbar;
-    private EditText mWeightText;
-    private int mYear;
-    private int mMonth;
-    private int mDay;
+	protected Button mDateDisplay;
+    protected Button mSave;
+    protected SeekBar mWeightSeekbar;
+    protected EditText mWeightText;
+    protected GregorianCalendar mDate;
         
     private DatePickerDialog.OnDateSetListener mDateSetListener;
         
@@ -65,38 +66,28 @@ public class LogActivity  extends Activity implements OnClickListener{
             }
         });
         // get the current date
-        final Calendar c = Calendar.getInstance();
-        mYear = c.get(Calendar.YEAR);
-        mMonth = c.get(Calendar.MONTH);
-        mDay = c.get(Calendar.DAY_OF_MONTH);
-
+        //final Calendar c = Calendar.getInstance();
+        mDate=new GregorianCalendar(year, monthOfYear, dayOfMonth);
         // display the current date (this method is below)
         updateDisplay();
         
         new DatePickerDialog.OnDateSetListener() {
 
-            public void onDateSet(DatePicker view, int year, 
-                                  int monthOfYear, int dayOfMonth) {
-                mYear = year;
-                mMonth = monthOfYear;
-                mDay = dayOfMonth;
+            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+            	mDate=new GregorianCalendar(year, monthOfYear, dayOfMonth);
                 updateDisplay();
             }
         };
     }
 	 private void updateDisplay() {
-	        mDateDisplay.setText(
-	            new StringBuilder()
-	                    // Month is 0 based so add 1
-	                    .append(mMonth + 1).append("-")
-	                    .append(mDay).append("-")
-	                    .append(mYear).append(" "));
+		 	SimpleDateFormat formatter=new SimpleDateFormat("MMMMM d, yyyy");
+			mDateDisplay.setText(formatter.format(mDate.getTime()));
 	    }
 	 @Override
 	protected Dialog onCreateDialog(int id) {
 		    switch (id) {
 		    case DATE_DIALOG_ID:
-		    	Dialog  dialog=new DatePickerDialog(this, mDateSetListener, mYear, mMonth, mDay);
+		    	Dialog  dialog=new DatePickerDialog(this, mDateSetListener, mDate.get(GregorianCalendar.YEAR), mDate.get(GregorianCalendar.MONTH), mDate.get(GregorianCalendar.DAY_OF_MONTH));
 		    	dialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
 		        return dialog;
 		    }
@@ -104,21 +95,25 @@ public class LogActivity  extends Activity implements OnClickListener{
 		}
 	@Override
 	public void onClick(View v) {
-		try
+		if(v.equals(mSave))
 		{
-			double weight=Double.parseDouble(mWeightText.getText().toString());
-			Date d=new Date(mYear-1900, mMonth, mDay);
-			WeightTime wt=new WeightTime(d, weight, Preferences.getUnit(this));
-			DBHelper.insertTimeWeight(this, wt);
-			
-			Preferences.setLastWeight(this, wt.getWeightKG());
+			try
+			{
+				float weight=Float.parseFloat(mWeightText.getText().toString());
+				
+				WeightTime wt=new WeightTime(mDate, weight, Preferences.getUnit(this));
+				DBHelper.insertRow(this, wt);
+				
+				Preferences.setLastWeight(this, wt.getWeightKG());
+			}
+			catch(NumberFormatException e)
+			{
+				createError(R.string.weight_number);
+			}
 		}
-		catch(NumberFormatException e)
-		{
-			createError(R.string.weight_number);
-		}
+		
 	}
-	private void createError(int resourceID)
+	protected void createError(int resourceID)
 	{
 		AlertDialog.Builder errorMessage=new AlertDialog.Builder(this);
 		errorMessage.setTitle(R.string.error);
@@ -130,7 +125,12 @@ public class LogActivity  extends Activity implements OnClickListener{
 	public void onResume()
 	{
 		super.onResume();
-		double lastWeight=Preferences.getLastWeight(this);
+		fillInPrevious();
+		
+	}
+	protected void fillInPrevious()
+	{
+		float lastWeight=Preferences.getLastWeight(this);
 		if(Preferences.getUnit(this).equals(WeightTime.POUND))
 		{
 			lastWeight=WeightTime.kgsToLbs(lastWeight);

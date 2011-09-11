@@ -6,6 +6,7 @@ import java.util.GregorianCalendar;
 import java.util.LinkedList;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.ContextMenu;
 import android.view.Gravity;
@@ -90,6 +91,8 @@ public class HistoryActivity extends Activity
 	{
 		if(item.getItemId()==MODIFY_ACTION)
 		{
+			Intent intent = new Intent(this, SettingsActivity.class);        	
+        	startActivity(intent);
 			return true;
 		}
 		else if(item.getItemId()==DELETE_ACTION)
