@@ -116,7 +116,7 @@ public class DBHelper extends SQLiteOpenHelper
 		SQLiteDatabase db=helper.getWritableDatabase();
 		ContentValues cv=new ContentValues();
 		cv.put(DATE, weightTime.getDate().getTimeInMillis());
-		cv.put(WEIGHT, weightTime.getWeightLB());
+		cv.put(WEIGHT, weightTime.getWeightKG());
 		int result=db.update(DATA_TABLE, cv, UID+"="+rowID, null);
 		db.close();
 		return result;

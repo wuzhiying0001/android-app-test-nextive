@@ -17,6 +17,13 @@
       android:layout_alignParentLeft="true">
     </Button>
     <Button
+      android:id="@+id/timeDisplay"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_toRightOf="@+id/dateDisplay"
+      android:layout_alignParentTop="true">
+    </Button>
+    <Button
       android:text="@string/save"
       android:layout_height="wrap_content"
       android:layout_width="wrap_content"

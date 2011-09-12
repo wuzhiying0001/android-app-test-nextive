@@ -20,7 +20,7 @@ import android.widget.TextView;
 
 public class HistoryActivity extends Activity
 {
-	private View clickedOnView;
+	private View clickedOnRow;
 	private TableLayout table;
 	private final int DELETE_ACTION=1;
 	private final int MODIFY_ACTION=0;
@@ -56,7 +56,7 @@ public class HistoryActivity extends Activity
 			date.setTextAppearance(this, android.R.style.TextAppearance_Medium);
 			date.setGravity(Gravity.LEFT);
 			SimpleDateFormat formatter=new SimpleDateFormat("MMMMM d, yyyy");
-			date.setText(formatter.format(aRow.getDate()));
+			date.setText(formatter.format(aRow.getDate().getTime()));
 			TextView weight = new TextView(this);
 			weight.setTextAppearance(this, android.R.style.TextAppearance_Medium);
 			weight.setGravity(Gravity.RIGHT);
@@ -69,7 +69,6 @@ public class HistoryActivity extends Activity
 				weight.setText(aRow.getWeightLBString() + "lbs");
 			}
 			registerForContextMenu(tr);
-			// tr.setOnLongClickListener(this);
 			tr.addView(date);
 			tr.addView(weight);
 			table.addView(tr);
@@ -80,10 +79,13 @@ public class HistoryActivity extends Activity
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo)
 	{
 		super.onCreateContextMenu(menu, v, menuInfo);
-		menu.setHeaderTitle("Action menu");
+		TableRow tr=(TableRow)v;
+		TextView tv1=(TextView)tr.getChildAt(0);
+		TextView tv2=(TextView)tr.getChildAt(1);
+		menu.setHeaderTitle(tv1.getText()+" "+tv2.getText());
 		menu.add(0, MODIFY_ACTION, 0, "Modify");
 		menu.add(0, DELETE_ACTION, 1, "Delete");
-		clickedOnView = v;
+		clickedOnRow = v;
 	}
 
 	@Override
@@ -91,14 +93,15 @@ public class HistoryActivity extends Activity
 	{
 		if(item.getItemId()==MODIFY_ACTION)
 		{
-			Intent intent = new Intent(this, SettingsActivity.class);        	
+			Intent intent = new Intent(getBaseContext(), ModifyRecordActivity.class);   
+			intent.putExtra(DBHelper.UID, clickedOnRow.getId());
         	startActivity(intent);
 			return true;
 		}
 		else if(item.getItemId()==DELETE_ACTION)
 		{
-			DBHelper.deleteRow(this, clickedOnView.getId());
-			table.removeView(clickedOnView);
+			DBHelper.deleteRow(this, clickedOnRow.getId());
+			table.removeView(clickedOnRow);
 			return true;
 		}
 		
