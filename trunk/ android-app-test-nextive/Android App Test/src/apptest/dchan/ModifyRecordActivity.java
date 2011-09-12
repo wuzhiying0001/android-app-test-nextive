@@ -1,7 +1,6 @@
 package apptest.dchan;
 
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 
 import android.os.Bundle;
 import android.view.View;
@@ -21,8 +20,7 @@ public class ModifyRecordActivity extends LogActivity{
 				finish();
 			}
         });
-        
-        recordID=savedInstanceState.getInt(DBHelper.UID);
+        recordID=getIntent().getIntExtra(DBHelper.UID, -1);
 	}
 	@Override
 	protected void fillInPrevious()
@@ -40,8 +38,8 @@ public class ModifyRecordActivity extends LogActivity{
 			mWeightText.setText(maxDigitsFormatter.format((wt.getWeightKG())));
 			mWeightSeekbar.setProgress((int) (wt.getWeightKG()*10));
 		}
-		SimpleDateFormat formatter=new SimpleDateFormat("MMMMM d, yyyy");
-		mDateDisplay.setText(formatter.format(wt.getDate()));
+		mDate=wt.getDate();
+		updateDisplay();
 	}
 	@Override
 	public void onClick(View v) {
@@ -62,5 +60,10 @@ public class ModifyRecordActivity extends LogActivity{
 				createError(R.string.weight_number);
 			}
 		}
+	}
+	@Override
+	public void onBackPressed() {
+		super.onBackPressed();
+		finish();
 	}
 }
