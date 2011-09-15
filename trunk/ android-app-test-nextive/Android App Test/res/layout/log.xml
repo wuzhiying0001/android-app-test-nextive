@@ -33,7 +33,7 @@
     <EditText
       android:layout_height="wrap_content"
       android:id="@+id/weightEditText"
-      android:inputType="numberDecimal"
+      android:inputType="phone"
       android:layout_width="wrap_content"
       android:layout_below="@+id/dateDisplay"
       android:layout_alignRight="@+id/dateDisplay"
