@@ -97,6 +97,8 @@ public class SettingsActivity extends Activity implements OnItemSelectedListener
 				{
 					Log.e(DEBUG_TAG, "Failed to get email data", e);
 				}
+			case CREATE_CONTACT_REQUEST:
+				
 			}
 		}
 	}
