@@ -1,5 +1,7 @@
 package apptest.dchan;
 
+import java.util.LinkedList;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
@@ -61,48 +63,46 @@ public class SettingsActivity extends Activity implements OnItemSelectedListener
 	protected void onActivityResult(int requestCode, int resultCode, Intent data)
 	{
 		super.onActivityResult(requestCode, resultCode, data);
-		String DEBUG_TAG = "1";
 		if (resultCode == RESULT_OK)
 		{
 			switch (requestCode)
 			{
 			case PICK_CONTACT_REQUEST:
-				Cursor cursor = null;
-				String email = "";
-				try
-				{
-					Uri result = data.getData();
-					Log.v(DEBUG_TAG,
-							"Got a contact result: " + result.toString());
-
-					// get the contact id from the Uri
-					String id = result.getLastPathSegment();
-
-					// query for everything email
-					cursor = getContentResolver().query(Email.CONTENT_URI,
-							null, Email.CONTACT_ID + "=?", new String[] { id },
-							null);
-
-					int emailIdx = cursor.getColumnIndex(Email.DATA);
-
-					// let's just get the first email
-					while (cursor.moveToNext())
-					{
-						email = cursor.getString(emailIdx);
-						Log.v(DEBUG_TAG, "Got email: " + email);
-					}
-
-				}
-				catch (Exception e)
-				{
-					Log.e(DEBUG_TAG, "Failed to get email data", e);
-				}
+				getContactEmail(data);
 			case CREATE_CONTACT_REQUEST:
-				
+				getContactEmail(data);
 			}
 		}
 	}
+	private LinkedList<String> getContactEmail(Intent data)
+	{
+		Cursor cursor = null;
+		LinkedList<String> emails=new LinkedList<String>();
+		try
+		{
+			Uri result = data.getData();
+			// get the contact id from the Uri
+			String id = result.getLastPathSegment();
 
+			// query for everything email
+			cursor = getContentResolver().query(Email.CONTENT_URI,
+					null, Email.CONTACT_ID + "=?", new String[] { id },
+					null);
+
+			int emailIdx = cursor.getColumnIndex(Email.DATA);
+
+			// let's just get the first email
+			while (cursor.moveToNext())
+			{
+				emails.add(cursor.getString(emailIdx));
+			}
+
+		}
+		catch (Exception e)
+		{
+		}
+		return emails;
+	}
 	@Override
 	public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2, long arg3)
 	{
