@@ -170,25 +170,20 @@ public class ShareActivity extends Activity implements OnClickListener {
 				else
 				{
 					s[0]=Preferences.getRecipientEmail(this);
-				}
-				
+				}				
 			}
-			if(shareFirst.isChecked() && shareLast.isChecked())
-			{
-				sendEmail(s, createMessage(beginningDate, endingDate));
-			}
-			else if(shareFirst.isChecked() && !shareLast.isChecked())
-			{
-				sendEmail(s, createMessage(beginningDate, null));
-			}
-			else if(!shareFirst.isChecked() && shareLast.isChecked())
-			{
-				sendEmail(s, createMessage(null, endingDate));
-			}
-			else
-			{
-				sendEmail(s, createMessage(null, null));
-			}
+      GregorianCalendar date1=null;
+      GregorianCalendar date2=null;
+      if(shareFirst.isChecked())
+        {
+          date1=beginningDate;
+        }
+        if(shareLast.isChecked())
+          {
+            date2=endingDate;
+          }
+				sendEmail(s, createMessage(date1, date2));
+			
 			
 		}
 		else if(v.equals(firstDate))
