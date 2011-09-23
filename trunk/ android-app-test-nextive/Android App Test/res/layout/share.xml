@@ -1,36 +1,98 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView
   android:id="@+id/widget0"
-  android:layout_width="fill_parent"
-  android:layout_height="fill_parent"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
   android:fillViewport="true"
   xmlns:android="http://schemas.android.com/apk/res/android">
   <RelativeLayout
     android:id="@+id/widget1"
-    android:layout_width="fill_parent"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
-
-    <TextView
+    <ToggleButton
+      android:id="@+id/shareMyselfToggleButton"
+      android:textOn="@string/myself"
+      android:textOff="@string/myself"
       android:layout_height="wrap_content"
-      android:textAppearance="?android:attr/textAppearanceLarge"
-      android:text="TextView"
-      android:id="@+id/textView1"
       android:layout_width="wrap_content"
-      android:layout_below="@+id/date_range"
+      android:layout_below="@+id/textView2"
+      android:layout_alignParentLeft="true"></ToggleButton>
+    <ToggleButton
+      android:id="@+id/shareContactToggleButton"
+      android:textOn="@string/contact"
+      android:textOff="@string/contact"
+      android:layout_height="wrap_content"
+      android:layout_width="wrap_content"
+      android:layout_below="@+id/textView2"
+      android:layout_toRightOf="@+id/shareMyselfToggleButton"></ToggleButton>
+    <Button
+      android:id="@+id/createNewContact"
+      android:text="@string/createNewContact"
+      android:layout_height="wrap_content"
+      android:layout_width="wrap_content"
+      android:layout_alignTop="@+id/shareContactToggleButton"
+      android:layout_toRightOf="@+id/shareContactToggleButton"></Button>
+    <TextView
+      android:textAppearance="?android:attr/textAppearanceLarge"
+      android:id="@+id/textView2"
+      android:text="@string/shareWith"
+      android:layout_height="wrap_content"
+      android:layout_width="wrap_content"
+      android:layout_below="@+id/linearLayout1"
       android:layout_alignParentLeft="true"></TextView>
     <TextView
-      android:layout_height="wrap_content"
       android:textAppearance="?android:attr/textAppearanceLarge"
-      android:text="TextView"
-      android:id="@+id/textView2"
-      android:layout_width="wrap_content"
-      android:layout_alignTop="@+id/textView1"
-      android:layout_alignParentRight="true"></TextView>
-    <SeekBar
-      android:id="@+id/seekBar1"
+      android:id="@+id/textView1"
+      android:text="@string/dateRange"
       android:layout_height="wrap_content"
-      android:layout_width="match_parent"
+      android:layout_width="wrap_content"
+      android:layout_below="@+id/createNewContact"
+      android:layout_alignParentLeft="true"></TextView>
+    <Button
+      android:id="@+id/firstDateButton"
+      android:text="Button"
+      android:layout_height="wrap_content"
+      android:layout_width="wrap_content"
+      android:layout_below="@+id/firstDateToggleButton"
+      android:layout_alignParentLeft="true"></Button>
+    <ToggleButton
+      android:id="@+id/lastDateToggleButton"
+      android:textOn="@string/custom"
+      android:textOff="@string/last"
+      android:layout_height="wrap_content"
+      android:layout_width="wrap_content"
+      android:layout_above="@+id/firstDateButton"
+      android:layout_alignParentRight="true"></ToggleButton>
+    <Button
+      android:id="@+id/lastDateButton"
+      android:text="Button"
+      android:layout_height="wrap_content"
+      android:layout_width="wrap_content"
+      android:layout_alignBottom="@+id/firstDateButton"
+      android:layout_alignParentRight="true"></Button>
+    <ToggleButton
+      android:id="@+id/firstDateToggleButton"
+      android:textOn="@string/custom"
+      android:textOff="@string/first"
+      android:layout_height="wrap_content"
+      android:layout_width="wrap_content"
       android:layout_below="@+id/textView1"
-      android:layout_alignParentLeft="true"></SeekBar>
+      android:layout_alignParentLeft="true"></ToggleButton>
+    <TextView
+      android:textAppearance="?android:attr/textAppearanceLarge"
+      android:id="@+id/textView3"
+      android:text="@string/to"
+      android:layout_height="wrap_content"
+      android:layout_width="wrap_content"
+      android:layout_alignBottom="@+id/firstDateToggleButton"
+      android:layout_centerHorizontal="true"></TextView>
+    <Button
+      android:id="@+id/shareButton"
+      android:text="@string/share"
+      android:layout_height="wrap_content"
+      android:layout_width="wrap_content"
+      android:layout_below="@+id/lastDateButton"
+      android:layout_alignParentRight="true"
+      ></Button>
   </RelativeLayout>
 </ScrollView>

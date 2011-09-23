@@ -45,6 +45,7 @@ public class HistoryActivity extends Activity
 	{
 		LinkedList<WeightTime> allEntries = DBHelper.getWeightTime(this, null, null);
 		boolean kg = Preferences.getUnit(this).equals(WeightTime.KILOGRAM);
+		SimpleDateFormat formatter=new SimpleDateFormat("MMMMM d, yyyy");
 		TableLayout.LayoutParams lp = new TableLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
 		lp.setMargins(0, 10, 0, 0);
 		for (WeightTime aRow : allEntries)
@@ -55,7 +56,6 @@ public class HistoryActivity extends Activity
 			TextView date = new TextView(this);
 			date.setTextAppearance(this, android.R.style.TextAppearance_Medium);
 			date.setGravity(Gravity.LEFT);
-			SimpleDateFormat formatter=new SimpleDateFormat("MMMMM d, yyyy");
 			date.setText(formatter.format(aRow.getDate().getTime()));
 			TextView weight = new TextView(this);
 			weight.setTextAppearance(this, android.R.style.TextAppearance_Medium);

@@ -48,17 +48,18 @@
       android:layout_height="wrap_content"
       android:layout_width="wrap_content"
       android:text="@string/default_email"
-      android:id="@+id/textView3"
+      android:id="@+id/textView123"
       android:layout_below="@+id/emailEditText"
       android:layout_alignParentLeft="true">
     </TextView>
-    <Spinner
+    <TextView
+      android:textAppearance="?android:attr/textAppearanceLarge"
       android:layout_height="wrap_content"
-      android:layout_width="fill_parent"
-      android:id="@+id/defaultEmailSpinner"
-      android:prompt="@string/default_email_prompt"
-      android:layout_below="@+id/textView3"
-      android:layout_alignParentLeft="true" />
+      android:layout_width="wrap_content"
+      android:id="@+id/defaultRecipientEmail"
+      android:layout_below="@+id/textView123"
+      android:layout_alignParentLeft="true">
+    </TextView>
     <Button
       android:text="@string/save"
       android:layout_height="wrap_content"
@@ -67,26 +68,47 @@
       android:layout_alignParentBottom="true"
       android:layout_alignParentRight="true">
     </Button>
+    <ToggleButton
+      android:layout_height="wrap_content"
+      android:textOn="@string/contact"
+      android:textOff="@string/contact"
+      android:id="@+id/contactDefaultContact"
+      android:layout_width="wrap_content"
+      android:layout_alignTop="@+id/myselfDefaultContact"
+      android:layout_toRightOf="@+id/myselfDefaultContact"></ToggleButton>
+    <ToggleButton
+      android:layout_height="wrap_content"
+      android:textOn="@string/myself"
+      android:textOff="@string/myself"
+      android:id="@+id/myselfDefaultContact"
+      android:layout_width="wrap_content"
+      android:layout_below="@+id/defaultRecipientEmail"
+      android:layout_alignParentLeft="true"></ToggleButton>
+    <Button
+      android:text="@string/createNewContact"
+      android:layout_height="wrap_content"
+      android:id="@+id/createNewContact"
+      android:layout_width="wrap_content"
+      android:layout_alignTop="@+id/contactDefaultContact"
+      android:layout_toRightOf="@+id/contactDefaultContact"></Button>
     <RadioGroup
       android:layout_width="wrap_content"
-      android:id="@+id/optionsGroup"
       android:layout_height="wrap_content"
-      android:layout_below="@+id/defaultEmailSpinner"
-      android:layout_alignParentLeft="true"
-      android:layout_marginTop="14dp">
+      android:id="@+id/optionsGroup"
+      android:layout_below="@+id/createNewContact"
+      android:layout_alignParentLeft="true">
       <RadioButton
-        android:id="@+id/optionsPounds"
-        android:text="@string/pounds"
-        android:layout_height="wrap_content"
         android:layout_width="wrap_content"
-        android:checked="true">
-      </RadioButton>
-      <RadioButton
-        android:id="@+id/optionsKilos"
-        android:text="@string/kilos"
         android:layout_height="wrap_content"
-        android:layout_width="wrap_content">
-      </RadioButton>
+        android:text="@string/pounds"
+        android:checked="true"
+        android:id="@+id/optionsPounds"></RadioButton>
+      <RadioButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/kilos"
+        android:id="@+id/optionsKilos"></RadioButton>
     </RadioGroup>
+
   </RelativeLayout>
 </ScrollView>

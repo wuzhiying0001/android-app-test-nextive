@@ -65,7 +65,7 @@ public class DBHelper extends SQLiteOpenHelper
 		return result;
 	}
 	
-	public static LinkedList<WeightTime> getWeightTime(Context c, Date startDate, Date endDate)
+	public static LinkedList<WeightTime> getWeightTime(Context c, GregorianCalendar startDate, GregorianCalendar endDate)
 	{
 		LinkedList<WeightTime> results=new LinkedList<WeightTime>();
 		DBHelper helper=new DBHelper(c, DBNAME, VERSION);
@@ -139,4 +139,21 @@ public class DBHelper extends SQLiteOpenHelper
 		}
 		return returnItem;
 	}
+	
+	public static GregorianCalendar getFirstEntryDate(Context c)
+	{
+		DBHelper helper=new DBHelper(c, DBNAME, VERSION);
+		SQLiteDatabase db=helper.getReadableDatabase();
+		String[] columns={DATE};
+		Cursor cursor=db.query(DATA_TABLE, columns, null, null, null, null, DATE+" asc", "1");
+		if(cursor.moveToNext())
+		{
+			GregorianCalendar date=new GregorianCalendar();
+			date.setTimeInMillis(cursor.getLong(cursor.getColumnIndexOrThrow(DATE)));
+			return date;
+		}
+		return null;
+	}
+	
+	
 }

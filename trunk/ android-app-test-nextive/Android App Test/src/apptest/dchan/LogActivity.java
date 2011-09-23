@@ -24,6 +24,7 @@ import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.TimePicker;
 import android.widget.SeekBar.OnSeekBarChangeListener;
+import android.widget.Toast;
 
 public class LogActivity extends Activity implements OnClickListener
 {
@@ -163,11 +164,10 @@ public class LogActivity extends Activity implements OnClickListener
 			try
 			{
 				float weight = Float.parseFloat(mWeightText.getText().toString());
-
 				WeightTime wt = new WeightTime(mDate, weight, Preferences.getUnit(this));
 				DBHelper.insertRow(this, wt);
-
 				Preferences.setLastWeight(this, wt.getWeightKG());
+				Toast.makeText(this, R.string.recordSaved, Toast.LENGTH_LONG);
 			}
 			catch (NumberFormatException e)
 			{

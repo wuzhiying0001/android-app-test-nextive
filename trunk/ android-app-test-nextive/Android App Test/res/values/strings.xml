@@ -7,19 +7,13 @@
 	<string name="save">Save</string>
 	<string name="pounds">Pounds</string>
 	<string name="kilos">Kilograms</string>
-	<string name="default_email_prompt">Choose a default recipient</string>
-	<string-array name="default_email_array">
-		<item>Myself</item>
-		<item>Existing Contact</item>
-		<item>New Contact</item>
-	</string-array>
 	<string name="error">Error!</string>
 	<string name="name_missing">You forgot to enter a name!</string>
 	<string name="email_missing">You forgot to enter an email!</string>
 	<string name="ok">ok</string>
 	<string name="weight_number">You must put a number for the weight!</string>
 	<string name="cancel">Cancel</string>
-	<string name="undefinedTypeLabel">(Undefined)</string>
+	<string name="unknownType">unknown</string>
 	<string name="selectAccountLabel">Select</string>
 	<string name="selectLabel">Select label</string>
 	<string name="contactCreationFailure">Contact creation failed, check logs.</string>
@@ -27,15 +21,19 @@
 	<string name="contactName">Contact Name</string>
 	<string name="contactPhone">Contact Phone</string>
 	<string name="targetAccountLabel">Target Account</string>
-	<string-array name="emailOptions">
-		<item>Home</item>
-		<item>Work</item>
-		<item>Other</item>
-	</string-array>
-	<string-array name="phoneOptions">
-		<item>Home</item>
-		<item>Work</item>
-		<item>Other</item>
-	</string-array>
+	<string name="phoneNumberFormatException">Only numbers are allowed for the phone number.</string>
+	<string name="recordSaved">Record Saved</string>
+	<string name="createNewContact">Create New Contact</string>
+	<string name="myself">Myself</string>
+	<string name="contact">Contact</string>
+	<string name="noEmail">This person has no email!</string>
+	<string name="shareWith">Share with who?</string>
+	<string name="share">Share</string>
+	<string name="first">First</string>
+	<string name="last">Last</string>
+	<string name="dateRange">Date Range:</string>
+	<string name="to">to</string>
+	<string name="custom">Custom</string>
+	<string name="emailSubject">Weight Information</string>
 
 </resources>
