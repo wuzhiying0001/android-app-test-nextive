@@ -75,4 +75,16 @@ public class Preferences {
 		SharedPreferences settings=c.getSharedPreferences(PREF_FILE, Context.MODE_PRIVATE);
 		return settings.getFloat(LAST_WEIGHT, 150);
 	}
+	public static void setRecipientEmail(Context c, String email)
+	{
+		SharedPreferences settings=c.getSharedPreferences(PREF_FILE, Context.MODE_PRIVATE);
+		SharedPreferences.Editor editor=settings.edit();
+		editor.putString(DEFAULT_RECIPIENT_EMAIL, email);
+		editor.commit();
+	}
+	public static String getRecipientEmail(Context c)
+	{
+		SharedPreferences settings=c.getSharedPreferences(PREF_FILE, Context.MODE_PRIVATE);
+		return settings.getString(DEFAULT_RECIPIENT_EMAIL, "");
+	}
 }

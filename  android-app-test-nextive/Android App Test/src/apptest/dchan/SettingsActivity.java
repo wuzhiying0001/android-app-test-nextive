@@ -4,58 +4,63 @@ import java.util.LinkedList;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Email;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemSelectedListener;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.RadioButton;
-import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.ToggleButton;
 
-public class SettingsActivity extends Activity implements OnItemSelectedListener, OnClickListener
+public class SettingsActivity extends Activity implements OnClickListener, OnCheckedChangeListener
 {
 	final private int PICK_CONTACT_REQUEST = 1;
 	final private int CREATE_CONTACT_REQUEST = 2;
 
-	Spinner defaultEmailSpinner;
 	Button saveButton;
+	Button createContactButton;
 	EditText nameEditText;
 	EditText emailEditText;
-	String defaultEmail;
 	RadioButton kilograms;
 	RadioButton pounds;
+	TextView defaultEmail;
+	ToggleButton myself;
+	ToggleButton contact;
+	String[] emailOptions;
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.settings);
-		defaultEmailSpinner = (Spinner) findViewById(R.id.defaultEmailSpinner);
-		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
-				this, R.array.default_email_array,
-				android.R.layout.simple_spinner_item);
-		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		defaultEmailSpinner.setAdapter(adapter);
-		defaultEmailSpinner.setOnItemSelectedListener(this);
 
-		saveButton = (Button) findViewById(R.id.saveButton);
-		saveButton.setOnClickListener(this);
-		
+		saveButton=(Button)findViewById(R.id.saveButton);
+		createContactButton=(Button)findViewById(R.id.createNewContact);
+		myself=(ToggleButton)findViewById(R.id.myselfDefaultContact);
+		contact=(ToggleButton)findViewById(R.id.contactDefaultContact);
 		nameEditText=(EditText)findViewById(R.id.nameEditText);
 		emailEditText=(EditText)findViewById(R.id.emailEditText);
-		
 		kilograms=(RadioButton)findViewById(R.id.optionsKilos);
 		pounds=(RadioButton)findViewById(R.id.optionsPounds);
+		defaultEmail=(TextView)findViewById(R.id.defaultRecipientEmail);
+		
+		myself.setOnCheckedChangeListener(this);
+		contact.setOnCheckedChangeListener(this);
+		saveButton.setOnClickListener(this);
+		createContactButton.setOnClickListener(this);
+				
+		defaultEmail.setText(Preferences.getRecipientEmail(this));
 		
 	}
 
@@ -68,10 +73,48 @@ public class SettingsActivity extends Activity implements OnItemSelectedListener
 			switch (requestCode)
 			{
 			case PICK_CONTACT_REQUEST:
-				getContactEmail(data);
+				emailOptions=getContactEmail(data).toArray(new String[0]);
+				setMail();
+				break;
 			case CREATE_CONTACT_REQUEST:
-				getContactEmail(data);
+				emailOptions=getContactEmail(data).toArray(new String[0]);
+				setMail();
+				break;
 			}
+		}
+		else if(resultCode==RESULT_CANCELED && requestCode==PICK_CONTACT_REQUEST)
+		{
+			contact.setChecked(false);
+		}
+	}
+	private void setMail()
+	{
+		if(emailOptions.length>1)
+		{
+			final Context c=this;
+			AlertDialog.Builder asdf=new Builder(this);
+			asdf.setItems(emailOptions, new DialogInterface.OnClickListener(){
+
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					String zxcv=emailOptions[which];
+					Preferences.setRecipientEmail(c, zxcv);
+					defaultEmail.setText(zxcv);
+				}
+				
+			});
+			asdf.show();
+		}
+		else if(emailOptions.length==1)
+		{
+			String zxcv=emailOptions[0];
+			Preferences.setRecipientEmail(this, zxcv);
+			defaultEmail.setText(zxcv);
+		}
+		else
+		{
+			createError(R.string.noEmail);
+			contact.setChecked(false);
 		}
 	}
 	private LinkedList<String> getContactEmail(Intent data)
@@ -104,49 +147,35 @@ public class SettingsActivity extends Activity implements OnItemSelectedListener
 		return emails;
 	}
 	@Override
-	public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2, long arg3)
+	public void onClick(View arg0)
 	{
-		Resources res = getResources();
-		String[] defaultEmailList = res.getStringArray(R.array.default_email_array);
-		if (arg0.getItemAtPosition(arg2).toString().equals(defaultEmailList[1]))
+		if(arg0.equals(saveButton))
 		{
-			Intent intent = new Intent(Intent.ACTION_PICK);
-			intent.setData(ContactsContract.Contacts.CONTENT_URI);
-			startActivityForResult(intent, PICK_CONTACT_REQUEST);
+			if(!emailEditText.getText().toString().equals("") && !nameEditText.getText().toString().equals(""))
+			{
+				savePreferences();
+				if(Preferences.isFirstTime(this))
+				{
+					Preferences.setFirstTime(this, false);
+					setResult(Activity.RESULT_OK);
+		            finish();
+				}
+			}
+			else if(nameEditText.getText().toString().equals(""))
+			{
+				createError(R.string.email_missing);
+			}
+			else
+			{
+				createError(R.string.name_missing);
+			}
 		}
-		else if (arg0.getItemAtPosition(arg2).toString().equals(defaultEmailList[2]))
+		else if(arg0.equals(createContactButton))
 		{
 			Intent intent = new Intent(this, CreateContactsActivity.class);
 			startActivityForResult(intent, PICK_CONTACT_REQUEST);
 		}
-	}
-
-	@Override
-	public void onNothingSelected(AdapterView<?> arg0)
-	{
 		
-	}
-
-	@Override
-	public void onClick(View arg0)
-	{
-		if(!emailEditText.getText().toString().equals("") && !nameEditText.getText().toString().equals(""))
-		{
-			savePreferences();
-			if(Preferences.isFirstTime(this))
-			{
-				Preferences.setFirstTime(this, false);
-				finish();
-			}
-		}
-		else if(nameEditText.getText().toString().equals(""))
-		{
-			createError(R.string.email_missing);
-		}
-		else
-		{
-			createError(R.string.name_missing);
-		}
 	}
 	private void savePreferences()
 	{
@@ -185,5 +214,22 @@ public class SettingsActivity extends Activity implements OnItemSelectedListener
 		errorMessage.setMessage(resourceID);
 		errorMessage.setPositiveButton(R.string.ok, null);
 		errorMessage.show();
+	}
+
+	@Override
+	public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+		if(buttonView.equals(contact))
+		{
+			if(isChecked)
+			{
+				Intent intent = new Intent(Intent.ACTION_PICK);
+				intent.setData(ContactsContract.Contacts.CONTENT_URI);
+				startActivityForResult(intent, PICK_CONTACT_REQUEST);
+			}
+			else
+			{
+				defaultEmail.setText("");
+			}
+		}
 	}
 }

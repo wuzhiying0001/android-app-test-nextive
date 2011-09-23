@@ -1,6 +1,7 @@
 package apptest.dchan;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 
 import android.accounts.Account;
@@ -11,7 +12,6 @@ import android.content.ContentProviderResult;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Parcel;
 import android.provider.ContactsContract;
 import android.text.InputType;
 import android.util.Log;
@@ -22,17 +22,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.Spinner;
 import android.widget.TableLayout;
-import android.widget.TableRow;
 import apptest.dchan.R;
-import apptest.dchan.R.array;
-import apptest.dchan.R.id;
-import apptest.dchan.R.layout;
-import apptest.dchan.R.string;
 
 public final class CreateContactsActivity extends Activity implements OnClickListener
 {
@@ -85,10 +79,14 @@ public final class CreateContactsActivity extends Activity implements OnClickLis
         emailTypes.add(ContactsContract.CommonDataKinds.Email.TYPE_OTHER);
         
         allAccouts=AccountManager.get(this).getAccounts();
-        //addPhoneRow();
-        //addEmailRow();
+        
         loadAccounts();
         loadRows();
+    }
+    @Override
+    public Object onRetainNonConfigurationInstance()
+    {
+    	return saveRows();
     }
     private void loadAccounts()
     {
@@ -136,8 +134,9 @@ public final class CreateContactsActivity extends Activity implements OnClickLis
 	}
 	private void save()
 	{
-		String name = contactName.getText().toString();
-		String accountName=(String)accountSpinner.getSelectedItem();
+		ContactInfo info=saveRows();
+		String name = info.getName();
+		String accountName=info.getAccountName();
 		Account selectedAccount=findAccount(accountName);
         // Prepare contact creation request
         //
@@ -156,15 +155,17 @@ public final class CreateContactsActivity extends Activity implements OnClickLis
                 .withValue(ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME, name)
                 .build());
         
-        for(int i=0; i<phoneTable.getChildCount(); i++)
-        {
-        	LinearLayout zxcv=(LinearLayout)phoneTable.getChildAt(i);
-        	Spinner phoneSpinner=(Spinner)zxcv.getChildAt(0);
-        	int phoneType=phoneTypes.get(phoneSpinner.getSelectedItemPosition());
+        LinkedList<Integer> contactPhoneType=info.getPhoneTypes();
+		LinkedList<String> contactPhoneNumbers=info.getPhoneNumbers();
+		Iterator<Integer> iter=contactPhoneType.iterator();
+		Iterator<String> iter1=contactPhoneNumbers.iterator();
+		while(iter.hasNext() && iter1.hasNext())
+		{
+			int phoneType=phoneTypes.get(iter.next().intValue());
         	int phoneNumber;
         	try
         	{
-        		phoneNumber=Integer.parseInt(((EditText)zxcv.getChildAt(1)).getText().toString());
+        		phoneNumber=Integer.parseInt(iter1.next());
         	}
         	catch(NumberFormatException e)
         	{
@@ -183,13 +184,14 @@ public final class CreateContactsActivity extends Activity implements OnClickLis
                      .withValue(ContactsContract.CommonDataKinds.Phone.TYPE, phoneType)
                      .build());
         }
-        
-        for(int i=0; i<emailTable.getChildCount(); i++)
-        {
-        	LinearLayout zxcv=(LinearLayout)emailTable.getChildAt(i);
-        	Spinner emailSpinner=(Spinner)zxcv.getChildAt(0);
-        	int emailType=emailTypes.get(emailSpinner.getSelectedItemPosition());
-        	String emailAddress=((EditText)zxcv.getChildAt(1)).getText().toString();
+		LinkedList<Integer> contactEmailTypes=info.getEmailType();
+		LinkedList<String> contactEmails=info.getEmails();
+		iter=contactEmailTypes.iterator();
+		iter1=contactEmails.iterator();
+		while(iter.hasNext() && iter1.hasNext())
+		{
+			int emailType=emailTypes.get(iter.next().intValue());
+        	String emailAddress=iter1.next();
         	ops.add(ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
                     .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, 0)
                     .withValue(ContactsContract.Data.MIMETYPE,
@@ -197,8 +199,7 @@ public final class CreateContactsActivity extends Activity implements OnClickLis
                     .withValue(ContactsContract.CommonDataKinds.Email.DATA, emailAddress)
                     .withValue(ContactsContract.CommonDataKinds.Email.TYPE, emailType)
                     .build());
-        }
-
+		}
         try {
             ContentProviderResult[] asdf=getContentResolver().applyBatch(ContactsContract.AUTHORITY, ops);
             Intent intent=new Intent(Intent.ACTION_PICK, asdf[0].uri);
@@ -241,9 +242,6 @@ public final class CreateContactsActivity extends Activity implements OnClickLis
     {
     	if(phoneTable.getChildCount()>0)
     		phoneTable.removeViewAt(phoneTable.getChildCount()-1);
-//    	LinearLayout zxcv=(LinearLayout)phoneTable.getChildAt(phoneTable.getChildCount());
-//    	Spinner phoneSpinner=(Spinner)zxcv.getChildAt(0);
-//    	Log.i(phoneSpinner.getSelectedItem().toString(), "");
     }
     private void addEmailRow()
     {
@@ -278,41 +276,132 @@ public final class CreateContactsActivity extends Activity implements OnClickLis
     }
     private void loadRows()
     {
-    	
+    	ContactInfo info=(ContactInfo)getLastNonConfigurationInstance();
+    	if(info!=null)
+    	{
+    		contactName.setText(info.getName());
+    		accountSpinner.setSelection(info.getSelectedAccount());
+    		LinkedList<Integer> phoneType=info.getPhoneTypes();
+    		LinkedList<String> phoneNumber=info.getPhoneNumbers();
+    		Iterator<Integer> i=phoneType.iterator();
+    		Iterator<String> i1=phoneNumber.iterator();
+    		while(i.hasNext() && i1.hasNext())
+    		{
+    			addPhoneRow();
+    			LinearLayout zxcv=(LinearLayout)phoneTable.getChildAt(phoneTable.getChildCount()-1);
+            	Spinner phoneSpinner=(Spinner)zxcv.getChildAt(0);
+            	phoneSpinner.setSelection(i.next());
+            	EditText phone=(EditText)zxcv.getChildAt(1);
+            	phone.setText(i1.next());
+    		}
+    		
+    		LinkedList<Integer> emailType=info.getEmailType();
+    		LinkedList<String> emails=info.getEmails();
+    		i=emailType.iterator();
+    		i1=emails.iterator();
+    		while(i.hasNext() && i1.hasNext())
+    		{
+    			addEmailRow();
+    			LinearLayout zxcv=(LinearLayout)emailTable.getChildAt(emailTable.getChildCount()-1);
+            	Spinner emailSpinner=(Spinner)zxcv.getChildAt(0);
+            	emailSpinner.setSelection(i.next());
+            	EditText emailAddress=(EditText)zxcv.getChildAt(1);
+            	emailAddress.setText(i1.next());
+    		}
+    	}
+    }
+    private ContactInfo saveRows()
+    {
+    	ContactInfo info=new ContactInfo();
+    	info.setName(contactName.getText().toString());
+    	info.setSelectedAccount(accountSpinner.getSelectedItemPosition());
+    	info.setAccountName(accountSpinner.getSelectedItem().toString());
+    	for(int i=0; i<emailTable.getChildCount(); i++)
+        {
+        	LinearLayout zxcv=(LinearLayout)emailTable.getChildAt(i);
+        	Spinner emailSpinner=(Spinner)zxcv.getChildAt(0);
+        	int emailType=emailSpinner.getSelectedItemPosition();
+        	String emailAddress=((EditText)zxcv.getChildAt(1)).getText().toString();
+        	info.addEmail(emailType, emailAddress);
+        }
+    	for(int i=0; i<phoneTable.getChildCount(); i++)
+        {
+        	LinearLayout zxcv=(LinearLayout)phoneTable.getChildAt(i);
+        	Spinner phoneSpinner=(Spinner)zxcv.getChildAt(0);
+        	int phoneType=phoneSpinner.getSelectedItemPosition();
+        	String phoneNumber=((EditText)zxcv.getChildAt(1)).getText().toString();
+        	info.addPhone(phoneType, phoneNumber);
+        }
+    	return info;
     }
     private class ContactInfo
     {
     	private String contactName;
+    	private int selectedAccount;
+    	private String selectedAccountName;
     	private LinkedList<Integer> phoneType;
-    	private LinkedList<Integer> phoneNumber;
+    	private LinkedList<String> phoneNumber;
     	private LinkedList<Integer> emailType;
     	private LinkedList<String> email;
     	public ContactInfo()
     	{
+    		selectedAccount=0;
+    		selectedAccountName="";
+    		contactName="";
     		phoneType=new LinkedList<Integer>();
-    		phoneNumber=new LinkedList<Integer>();
+    		phoneNumber=new LinkedList<String>();
     		emailType=new LinkedList<Integer>();
     		email=new LinkedList<String>();
     	}
-    	public void addPhone(int type, int number)
+    	public void setAccountName(String name)
+    	{
+    		selectedAccountName=name;
+    	}
+    	public String getAccountName()
+    	{
+    		return selectedAccountName;
+    	}
+    	public void addPhone(int type, String number)
     	{
     		phoneType.addLast(new Integer(type));
-    		phoneNumber.addLast(new Integer(number));
-    	}
-    	public void removePhone()
-    	{
-    		phoneNumber.removeLast();
-    		phoneType.removeLast();
+    		phoneNumber.addLast(number);
     	}
     	public void addEmail(int type, String number)
     	{
     		emailType.addLast(new Integer(type));
     		email.addLast(number);
     	}
-    	public void removeEmail()
+    	public void setName(String name)
     	{
-    		phoneNumber.removeLast();
-    		email.removeLast();
+    		contactName=name;
+    	}
+    	public String getName()
+    	{
+    		return contactName;
+    	}
+    	public void setSelectedAccount(int account)
+    	{
+    		selectedAccount=account;
+    	}
+    	public int getSelectedAccount()
+    	{
+    		return selectedAccount;
+    	}
+    	public LinkedList<Integer> getPhoneTypes()
+    	{
+    		return phoneType;
+    	}
+    	public LinkedList<String> getPhoneNumbers()
+    	{
+    		return phoneNumber;
+    	}
+    	public LinkedList<Integer> getEmailType()
+    	{
+    		return emailType;
+    	}
+    	public LinkedList<String> getEmails()
+    	{
+    		return email;
     	}
     }
 }

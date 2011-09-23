@@ -15,8 +15,8 @@ public class HostActivity extends TabActivity {
 
         if(Preferences.isFirstTime(this))
         {
-        	Intent intent = new Intent(this, SettingsActivity.class);        	
-        	startActivity(intent);
+        	Intent intent = new Intent(this, SettingsActivity.class);    
+        	startActivityForResult(intent, 0);
         }
         
         Resources res = getResources(); // Resource object to get Drawables
@@ -54,5 +54,12 @@ public class HostActivity extends TabActivity {
         tabHost.setCurrentTab(0);
         
 	}
-    
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data)
+	{
+		if (resultCode != RESULT_OK)
+		{
+			finish();
+		}
+	}
 }
