@@ -29,7 +29,7 @@ public class ModifyRecordActivity extends LogActivity {
 		WeightTime wt = DBHelper.getRow(this, mRecordId);
 		DecimalFormat maxDigitsFormatter = new DecimalFormat("#.#");
 
-		if (Preferences.getUnit(this).equals(WeightTime.POUND)) {
+		if (Preferences.getUnit(this).equals(WeightTime.Unit.POUND)) {
 			mWeightText.setText(maxDigitsFormatter.format((wt.getWeightLB())));
 			mWeightSeekbar.setProgress((int) (wt.getWeightLB() * 10));
 		} else {

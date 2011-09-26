@@ -12,15 +12,16 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 public class DBHelper extends SQLiteOpenHelper {
-	public final static String DBNAME = "weightAppDB";
+	private final static String DBNAME = "weightAppDB";
 
-	public final static String DATA_TABLE = "DATA";
-	public final static String CONTACT_TABLE = "CONTACTS";
+	private final static String DATA_TABLE = "DATA";
+	private final static String CONTACT_TABLE = "CONTACTS";
 
-	public final static String CONTACT_NAME = "CONTACT_NAME";
-	public final static String EMAIL_ADDRESS = "EMAIL_ADDRESS";
-	public final static String DATE = "DATE_VALUE";
-	public final static String WEIGHT = "WEIGHT";
+	private final static String CONTACT_NAME = "CONTACT_NAME";
+	private final static String EMAIL_ADDRESS = "EMAIL_ADDRESS";
+	private final static String DATE = "DATE_VALUE";
+	private final static String WEIGHT = "WEIGHT";
+	private final static String UNIT="UNIT";
 	public final static String UID = "ROWID";
 
 	public static int VERSION = 1;
@@ -37,7 +38,7 @@ public class DBHelper extends SQLiteOpenHelper {
 	public void onCreate(SQLiteDatabase db) {
 		try {
 			db.execSQL("CREATE TABLE IF NOT EXISTS " + DATA_TABLE + "(" + UID
-					+ " INTEGER PRIMARY KEY, " + DATE + " DATE, " + WEIGHT + " REAL)");
+					+ " INTEGER PRIMARY KEY, " + DATE + " DATE, " + WEIGHT + " REAL, "+UNIT+" TEXT)");
 			db.execSQL("CREATE TABLE IF NOT EXISTS " + CONTACT_TABLE + "(" + CONTACT_NAME
 					+ " TEXT, " + EMAIL_ADDRESS + " TEXT)");
 		} catch (SQLException e) {
@@ -59,7 +60,8 @@ public class DBHelper extends SQLiteOpenHelper {
 		SQLiteDatabase db = helper.getWritableDatabase();
 		ContentValues cv = new ContentValues();
 		cv.put(DATE, weightTime.getDate().getTimeInMillis());
-		cv.put(WEIGHT, weightTime.getWeightKG());
+		cv.put(WEIGHT, weightTime.getRawWeight());
+		cv.put(UNIT, weightTime.getUnit().toString());
 		long result = db.insertOrThrow(DATA_TABLE, null, cv);
 		db.close();
 		return result;
@@ -89,7 +91,8 @@ public class DBHelper extends SQLiteOpenHelper {
 			date.setTimeInMillis(cursor.getLong(cursor.getColumnIndexOrThrow(DATE)));
 			float weight = cursor.getFloat(cursor.getColumnIndex(WEIGHT));
 			int rowNum = cursor.getInt(cursor.getColumnIndex(UID));
-			WeightTime wt = new WeightTime(date, weight, WeightTime.KILOGRAM, rowNum);
+			String unit=cursor.getString(cursor.getColumnIndex(UNIT));
+			WeightTime wt = new WeightTime(date, weight, WeightTime.Unit.valueOf(unit), rowNum);
 			results.addLast(wt);
 		}
 		cursor.close();
@@ -110,7 +113,8 @@ public class DBHelper extends SQLiteOpenHelper {
 		SQLiteDatabase db = helper.getWritableDatabase();
 		ContentValues cv = new ContentValues();
 		cv.put(DATE, weightTime.getDate().getTimeInMillis());
-		cv.put(WEIGHT, weightTime.getWeightKG());
+		cv.put(WEIGHT, weightTime.getRawWeight());
+		cv.put(UNIT, weightTime.getUnit().toString());
 		int result = db.update(DATA_TABLE, cv, UID + "=" + rowID, null);
 		db.close();
 		return result;
@@ -127,7 +131,8 @@ public class DBHelper extends SQLiteOpenHelper {
 			GregorianCalendar date = new GregorianCalendar();
 			date.setTimeInMillis(cursor.getLong(cursor.getColumnIndexOrThrow(DATE)));
 			float weight = cursor.getFloat(cursor.getColumnIndex(WEIGHT));
-			returnItem = new WeightTime(date, weight, WeightTime.KILOGRAM, rowID);
+			String unit=cursor.getString(cursor.getColumnIndex(UNIT));
+			returnItem = new WeightTime(date, weight, WeightTime.Unit.valueOf(unit), rowID);
 		}
 		cursor.close();
 		return returnItem;

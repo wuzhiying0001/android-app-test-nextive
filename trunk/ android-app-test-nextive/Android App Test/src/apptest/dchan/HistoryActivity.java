@@ -37,7 +37,7 @@ public class HistoryActivity extends Activity {
 
 	private void populateTable() {
 		LinkedList<WeightTime> allEntries = DBHelper.getWeightTime(this, null, null);
-		boolean kg = Preferences.getUnit(this).equals(WeightTime.KILOGRAM);
+		boolean kg = Preferences.getUnit(this).equals(WeightTime.Unit.KILOGRAM);
 		SimpleDateFormat formatter = new SimpleDateFormat("MMMMM d, yyyy");
 		for (WeightTime aRow : allEntries) {
 			LayoutInflater inflater = getLayoutInflater();

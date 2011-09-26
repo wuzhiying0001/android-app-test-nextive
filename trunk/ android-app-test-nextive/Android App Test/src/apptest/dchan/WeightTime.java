@@ -6,25 +6,23 @@ import java.util.GregorianCalendar;
  * Class to store the weight and dates as a pair.
  */
 public class WeightTime {
-	public final static String KILOGRAM = "KILOGRAM";
-	public final static String POUND = "POUND";
+	public enum Unit{
+		KILOGRAM,
+		POUND
+	}
 	private int mRowId;
 	private GregorianCalendar mDate;
 	private float mWeight;
 	private static DecimalFormat maxDigitsFormatter = new DecimalFormat("#.#");
-
-	public WeightTime(GregorianCalendar _date, float _weight, String unit) {
-		if (unit.equals(POUND)) {
-			_weight = lbsToKgs(_weight);
-		}
+	private Unit mCurrentUnit;
+	public WeightTime(GregorianCalendar _date, float _weight, Unit unit) {
+		mCurrentUnit=unit;
 		mDate = _date;
 		mWeight = _weight;
 	}
 
-	public WeightTime(GregorianCalendar _date, float _weight, String unit, int _rowID) {
-		if (unit.equals(POUND)) {
-			_weight = lbsToKgs(_weight);
-		}
+	public WeightTime(GregorianCalendar _date, float _weight, Unit unit, int _rowID) {
+		mCurrentUnit=unit;
 		mDate = _date;
 		mWeight = _weight;
 		mRowId = _rowID;
@@ -47,25 +45,45 @@ public class WeightTime {
 	}
 
 	public float getWeightKG() {
-		return mWeight;
+		if(mCurrentUnit==Unit.KILOGRAM){
+			return mWeight;
+		}
+		return lbsToKgs(mWeight);
 	}
 
 	public float getWeightLB() {
+		if(mCurrentUnit==Unit.POUND){
+			return mWeight;
+		}
 		return kgsToLbs(mWeight);
 	}
 
+	public float getRawWeight()
+	{
+		return mWeight;
+	}
+	
+	public Unit getUnit()
+	{
+		return mCurrentUnit;
+	}
+	
 	public String getWeightKGString() {
-		return maxDigitsFormatter.format(mWeight);
+		if(mCurrentUnit==Unit.KILOGRAM){
+			return maxDigitsFormatter.format(mWeight);
+		}
+		return maxDigitsFormatter.format(lbsToKgs(mWeight));
 	}
 
 	public String getWeightLBString() {
+		if(mCurrentUnit==Unit.POUND){
+			return maxDigitsFormatter.format(mWeight);
+		}
 		return maxDigitsFormatter.format(kgsToLbs(mWeight));
 	}
 
-	public void setWeight(float _weight, String unit) {
-		if (unit.equals(POUND)) {
-			_weight = lbsToKgs(_weight);
-		}
+	public void setWeight(float _weight, Unit unit) {
+		mCurrentUnit=unit;
 		mWeight = _weight;
 	}
 
