@@ -1,9 +1,7 @@
 package apptest.dchan;
 
 import java.text.DecimalFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
@@ -12,9 +10,6 @@ import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -26,8 +21,7 @@ import android.widget.TimePicker;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.Toast;
 
-public class LogActivity extends Activity implements OnClickListener
-{
+public class LogActivity extends Activity implements OnClickListener {
 	protected Button mDateDisplay;
 	protected Button mTimeDisplay;
 	protected Button mSave;
@@ -42,8 +36,7 @@ public class LogActivity extends Activity implements OnClickListener
 	static final int TIME_DIALOG_ID = 1;
 
 	@Override
-	public void onCreate(Bundle savedInstanceState)
-	{
+	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.log);
 		mDateDisplay = (Button) findViewById(R.id.dateDisplay);
@@ -52,32 +45,18 @@ public class LogActivity extends Activity implements OnClickListener
 		mWeightText = (EditText) findViewById(R.id.weightEditText);
 		mWeightSeekbar = (SeekBar) findViewById(R.id.weightSeekBar);
 
-		if (Preferences.getUnit(this).equals(WeightTime.POUND))
-		{
-			mWeightSeekbar.setMax(4000);
-		}
-		else
-		{
-			mWeightSeekbar.setMax(1800);
-		}
-
-		mWeightSeekbar.setOnSeekBarChangeListener(new OnSeekBarChangeListener()
-		{
+		mWeightSeekbar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
 
 			@Override
-			public void onStopTrackingTouch(SeekBar seekBar)
-			{
+			public void onStopTrackingTouch(SeekBar seekBar) {
 			}
 
 			@Override
-			public void onStartTrackingTouch(SeekBar seekBar)
-			{
+			public void onStartTrackingTouch(SeekBar seekBar) {
 			}
 
 			@Override
-			public void onProgressChanged(SeekBar seekBar, int progress,
-					boolean fromUser)
-			{
+			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 				mWeightText.setText(progress / 10.0 + "");
 			}
 		});
@@ -85,19 +64,15 @@ public class LogActivity extends Activity implements OnClickListener
 		mSave.setOnClickListener(this);
 
 		// add a click listener to the button
-		mDateDisplay.setOnClickListener(new View.OnClickListener()
-		{
-			public void onClick(View v)
-			{
+		mDateDisplay.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
 				showDialog(DATE_DIALOG_ID);
 			}
 		});
-		mTimeDisplay.setOnClickListener(new View.OnClickListener()
-		{
+		mTimeDisplay.setOnClickListener(new View.OnClickListener() {
 
 			@Override
-			public void onClick(View v)
-			{
+			public void onClick(View v) {
 				showDialog(TIME_DIALOG_ID);
 			}
 		});
@@ -108,30 +83,26 @@ public class LogActivity extends Activity implements OnClickListener
 		// display the current date (this method is below)
 		updateDisplay();
 
-		mDateSetListener=new DatePickerDialog.OnDateSetListener()
-		{
-			public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth)
-			{
+		mDateSetListener = new DatePickerDialog.OnDateSetListener() {
+			public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
 				mDate.set(year, monthOfYear, dayOfMonth);
 				updateDisplay();
 			}
 		};
-		mTimeSetListener=new TimePickerDialog.OnTimeSetListener()
-		{
+		mTimeSetListener = new TimePickerDialog.OnTimeSetListener() {
 
 			@Override
-			public void onTimeSet(TimePicker view, int hourOfDay, int minute)
-			{
+			public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
 				// TODO Auto-generated method stub
 				mDate.set(GregorianCalendar.HOUR_OF_DAY, hourOfDay);
 				mDate.set(GregorianCalendar.MINUTE, minute);
 				updateDisplay();
 			}
 		};
+
 	}
 
-	protected void updateDisplay()
-	{
+	protected void updateDisplay() {
 		SimpleDateFormat formatter = new SimpleDateFormat("MMMMM d, yyyy");
 		mDateDisplay.setText(formatter.format(mDate.getTime()));
 		formatter.applyPattern("HH:mm");
@@ -139,17 +110,20 @@ public class LogActivity extends Activity implements OnClickListener
 	}
 
 	@Override
-	protected Dialog onCreateDialog(int id)
-	{
-		switch (id)
-		{
+	protected Dialog onCreateDialog(int id) {
+		switch (id) {
 		case DATE_DIALOG_ID:
-			Dialog dialog = new DatePickerDialog(this, mDateSetListener, mDate.get(GregorianCalendar.YEAR), mDate.get(GregorianCalendar.MONTH), mDate.get(GregorianCalendar.DAY_OF_MONTH));
+			Dialog dialog = new DatePickerDialog(this, mDateSetListener,
+					mDate.get(GregorianCalendar.YEAR), mDate.get(GregorianCalendar.MONTH),
+					mDate.get(GregorianCalendar.DAY_OF_MONTH));
+
 			dialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
 			return dialog;
 
 		case TIME_DIALOG_ID:
-			Dialog dialog1 = new TimePickerDialog(this, mTimeSetListener, mDate.get(GregorianCalendar.HOUR_OF_DAY), mDate.get(GregorianCalendar.MINUTE), true);
+			Dialog dialog1 = new TimePickerDialog(this, mTimeSetListener,
+					mDate.get(GregorianCalendar.HOUR_OF_DAY), mDate.get(GregorianCalendar.MINUTE), true);
+
 			dialog1.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
 			return dialog1;
 		}
@@ -157,28 +131,21 @@ public class LogActivity extends Activity implements OnClickListener
 	}
 
 	@Override
-	public void onClick(View v)
-	{
-		if (v.equals(mSave))
-		{
-			try
-			{
+	public void onClick(View v) {
+		if (v.equals(mSave)) {
+			try {
 				float weight = Float.parseFloat(mWeightText.getText().toString());
 				WeightTime wt = new WeightTime(mDate, weight, Preferences.getUnit(this));
 				DBHelper.insertRow(this, wt);
-				Preferences.setLastWeight(this, wt.getWeightKG());
-				Toast.makeText(this, R.string.recordSaved, Toast.LENGTH_LONG);
-			}
-			catch (NumberFormatException e)
-			{
+				Toast.makeText(this, R.string.recordSaved, Toast.LENGTH_LONG).show();
+			} catch (NumberFormatException e) {
 				createError(R.string.weight_number);
 			}
 		}
 
 	}
 
-	protected void createError(int resourceID)
-	{
+	protected void createError(int resourceID) {
 		AlertDialog.Builder errorMessage = new AlertDialog.Builder(this);
 		errorMessage.setTitle(R.string.error);
 		errorMessage.setMessage(resourceID);
@@ -187,18 +154,31 @@ public class LogActivity extends Activity implements OnClickListener
 	}
 
 	@Override
-	public void onResume()
-	{
+	public void onResume() {
 		super.onResume();
+		if (Preferences.getUnit(this).equals(WeightTime.POUND)) {
+			mWeightSeekbar.setMax(4000);
+		} else {
+			mWeightSeekbar.setMax(1800);
+		}
 		fillInPrevious();
+	}
+
+	@Override
+	public void onPause() {
+		super.onPause();
+		float lastEnteredWeight = Float.parseFloat(mWeightText.getText().toString());
+		if (Preferences.getUnit(this).equals(WeightTime.POUND)) {
+			Preferences.setLastWeight(this, WeightTime.lbsToKgs(lastEnteredWeight));
+		} else {
+			Preferences.setLastWeight(this, lastEnteredWeight);
+		}
 
 	}
 
-	protected void fillInPrevious()
-	{
+	protected void fillInPrevious() {
 		float lastWeight = Preferences.getLastWeight(this);
-		if (Preferences.getUnit(this).equals(WeightTime.POUND))
-		{
+		if (Preferences.getUnit(this).equals(WeightTime.POUND)) {
 			lastWeight = WeightTime.kgsToLbs(lastWeight);
 		}
 		DecimalFormat maxDigitsFormatter = new DecimalFormat("#.#");

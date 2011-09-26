@@ -1,110 +1,86 @@
 package apptest.dchan;
 
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.LinkedList;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.ContextMenu;
-import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
-import android.view.ViewGroup.LayoutParams;
+import android.widget.RelativeLayout;
 import android.widget.TableLayout;
-import android.widget.TableRow;
 import android.widget.TextView;
 
-public class HistoryActivity extends Activity
-{
-	private View clickedOnRow;
-	private TableLayout table;
-	private final int DELETE_ACTION=1;
-	private final int MODIFY_ACTION=0;
-	
+public class HistoryActivity extends Activity {
+	private View mClickedOnRow;
+	private TableLayout mTable;
+	private final int DELETE_ACTION = 1;
+	private final int MODIFY_ACTION = 0;
+
 	@Override
-	public void onCreate(Bundle savedInstanceState)
-	{
+	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.history);
-		table = (TableLayout) findViewById(R.id.histroy_table);
+		mTable = (TableLayout) findViewById(R.id.historyTable);
 	}
 
 	@Override
-	public void onResume()
-	{
+	public void onResume() {
 		super.onResume();
-		table.removeAllViews();
+		mTable.removeAllViews();
 		populateTable();
 	}
 
-	private void populateTable()
-	{
+	private void populateTable() {
 		LinkedList<WeightTime> allEntries = DBHelper.getWeightTime(this, null, null);
 		boolean kg = Preferences.getUnit(this).equals(WeightTime.KILOGRAM);
-		SimpleDateFormat formatter=new SimpleDateFormat("MMMMM d, yyyy");
-		TableLayout.LayoutParams lp = new TableLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
-		lp.setMargins(0, 10, 0, 0);
-		for (WeightTime aRow : allEntries)
-		{
-			TableRow tr = new TableRow(this);
-			tr.setLayoutParams(lp);
-			tr.setId(aRow.getRowID());
-			TextView date = new TextView(this);
-			date.setTextAppearance(this, android.R.style.TextAppearance_Medium);
-			date.setGravity(Gravity.LEFT);
+		SimpleDateFormat formatter = new SimpleDateFormat("MMMMM d, yyyy");
+		for (WeightTime aRow : allEntries) {
+			LayoutInflater inflater = getLayoutInflater();
+			View myView = inflater.inflate(R.layout.history_row, null);
+			myView.setId(aRow.getRowID());
+			TextView date = (TextView) myView.findViewById(R.id.date);
+			TextView weight = (TextView) myView.findViewById(R.id.weight);
 			date.setText(formatter.format(aRow.getDate().getTime()));
-			TextView weight = new TextView(this);
-			weight.setTextAppearance(this, android.R.style.TextAppearance_Medium);
-			weight.setGravity(Gravity.RIGHT);
-			if (kg)
-			{
+			if (kg) {
 				weight.setText(aRow.getWeightKGString() + "kgs");
-			}
-			else
-			{
+			} else {
 				weight.setText(aRow.getWeightLBString() + "lbs");
 			}
-			registerForContextMenu(tr);
-			tr.addView(date);
-			tr.addView(weight);
-			table.addView(tr);
+			registerForContextMenu(myView);
+			mTable.addView(myView);
 		}
 	}
 
 	@Override
-	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo)
-	{
+	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 		super.onCreateContextMenu(menu, v, menuInfo);
-		TableRow tr=(TableRow)v;
-		TextView tv1=(TextView)tr.getChildAt(0);
-		TextView tv2=(TextView)tr.getChildAt(1);
-		menu.setHeaderTitle(tv1.getText()+" "+tv2.getText());
+		RelativeLayout rl = (RelativeLayout) v;
+		TextView tv1 = (TextView) rl.findViewById(R.id.date);
+		TextView tv2 = (TextView) rl.findViewById(R.id.weight);
+		menu.setHeaderTitle(tv1.getText() + " " + tv2.getText());
 		menu.add(0, MODIFY_ACTION, 0, "Modify");
 		menu.add(0, DELETE_ACTION, 1, "Delete");
-		clickedOnRow = v;
+		mClickedOnRow = v;
 	}
 
 	@Override
-	 public boolean onContextItemSelected(MenuItem item) 
-	{
-		if(item.getItemId()==MODIFY_ACTION)
-		{
-			Intent intent = new Intent(getBaseContext(), ModifyRecordActivity.class);   
-			intent.putExtra(DBHelper.UID, clickedOnRow.getId());
-        	startActivity(intent);
+	public boolean onContextItemSelected(MenuItem item) {
+		if (item.getItemId() == MODIFY_ACTION) {
+			Intent intent = new Intent(getBaseContext(), ModifyRecordActivity.class);
+			intent.putExtra(DBHelper.UID, mClickedOnRow.getId());
+			startActivity(intent);
+			return true;
+		} else if (item.getItemId() == DELETE_ACTION) {
+			DBHelper.deleteRow(this, mClickedOnRow.getId());
+			mTable.removeView(mClickedOnRow);
 			return true;
 		}
-		else if(item.getItemId()==DELETE_ACTION)
-		{
-			DBHelper.deleteRow(this, clickedOnRow.getId());
-			table.removeView(clickedOnRow);
-			return true;
-		}
-		
-	    return false;
-	 }
+
+		return false;
+	}
 }
