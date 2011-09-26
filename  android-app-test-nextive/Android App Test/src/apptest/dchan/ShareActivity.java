@@ -136,14 +136,14 @@ public class ShareActivity extends Activity implements OnClickListener {
 
 	private String createMessage(GregorianCalendar startDate, GregorianCalendar endDate) {
 		SimpleDateFormat formatter = new SimpleDateFormat("MMMMM d, yyyy hh:mm a");
-		String unit = Preferences.getUnit(this);
+		WeightTime.Unit unit = Preferences.getUnit(this);
 		LinkedList<WeightTime> info = DBHelper.getWeightTime(this, startDate, endDate);
 		StringBuilder message = new StringBuilder();
 		Iterator<WeightTime> iter = info.iterator();
 		while (iter.hasNext()) {
 			WeightTime item = iter.next();
 			message.append(formatter.format(item.getDate().getTime()));
-			if (unit.equals(WeightTime.KILOGRAM)) {
+			if (unit.equals(WeightTime.Unit.KILOGRAM)) {
 				message.append("	" + item.getWeightKGString() + getString(R.string.kilos));
 			} else {
 				message.append("	" + item.getWeightLBString() + getString(R.string.pounds));

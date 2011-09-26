@@ -156,7 +156,7 @@ public class LogActivity extends Activity implements OnClickListener {
 	@Override
 	public void onResume() {
 		super.onResume();
-		if (Preferences.getUnit(this).equals(WeightTime.POUND)) {
+		if (Preferences.getUnit(this).equals(WeightTime.Unit.POUND)) {
 			mWeightSeekbar.setMax(4000);
 		} else {
 			mWeightSeekbar.setMax(1800);
@@ -168,7 +168,7 @@ public class LogActivity extends Activity implements OnClickListener {
 	public void onPause() {
 		super.onPause();
 		float lastEnteredWeight = Float.parseFloat(mWeightText.getText().toString());
-		if (Preferences.getUnit(this).equals(WeightTime.POUND)) {
+		if (Preferences.getUnit(this).equals(WeightTime.Unit.POUND)) {
 			Preferences.setLastWeight(this, WeightTime.lbsToKgs(lastEnteredWeight));
 		} else {
 			Preferences.setLastWeight(this, lastEnteredWeight);
@@ -178,7 +178,7 @@ public class LogActivity extends Activity implements OnClickListener {
 
 	protected void fillInPrevious() {
 		float lastWeight = Preferences.getLastWeight(this);
-		if (Preferences.getUnit(this).equals(WeightTime.POUND)) {
+		if (Preferences.getUnit(this).equals(WeightTime.Unit.POUND)) {
 			lastWeight = WeightTime.kgsToLbs(lastWeight);
 		}
 		DecimalFormat maxDigitsFormatter = new DecimalFormat("#.#");

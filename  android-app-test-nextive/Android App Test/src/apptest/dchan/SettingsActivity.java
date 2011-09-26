@@ -64,9 +64,9 @@ public class SettingsActivity extends Activity implements OnClickListener {
 		Preferences.setName(this, mNameEditText.getText().toString());
 		Preferences.setEmail(this, mEmailEditText.getText().toString());
 		if (mKilograms.isChecked()) {
-			Preferences.setUnit(this, WeightTime.KILOGRAM);
+			Preferences.setUnit(this, WeightTime.Unit.KILOGRAM);
 		} else {
-			Preferences.setUnit(this, WeightTime.POUND);
+			Preferences.setUnit(this, WeightTime.Unit.POUND);
 		}
 	}
 
@@ -75,7 +75,7 @@ public class SettingsActivity extends Activity implements OnClickListener {
 		super.onResume();
 		mNameEditText.setText(Preferences.getName(this));
 		mEmailEditText.setText(Preferences.getEmail(this));
-		if (Preferences.getUnit(this).equals(WeightTime.KILOGRAM)) {
+		if (Preferences.getUnit(this).equals(WeightTime.Unit.KILOGRAM)) {
 			mKilograms.setChecked(true);
 			mPounds.setChecked(false);
 		} else {
