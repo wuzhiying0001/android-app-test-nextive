@@ -1,5 +1,10 @@
 package apptest.dchan;
 
+/**
+ * A class to store a contact's name and email address
+ * @author Danny
+ *
+ */
 public class Contact {
 	private String mEmailAddress;
 	private String mName;
