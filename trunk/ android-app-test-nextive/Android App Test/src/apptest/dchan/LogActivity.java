@@ -45,6 +45,12 @@ public class LogActivity extends Activity implements OnClickListener {
 		mWeightText = (EditText) findViewById(R.id.weightEditText);
 		mWeightSeekbar = (SeekBar) findViewById(R.id.weightSeekBar);
 
+		mSave.setOnClickListener(this);
+
+		mDate = new GregorianCalendar();
+
+		updateDisplay();
+
 		mWeightSeekbar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
 
 			@Override
@@ -55,20 +61,21 @@ public class LogActivity extends Activity implements OnClickListener {
 			public void onStartTrackingTouch(SeekBar seekBar) {
 			}
 
+			/**
+			 * Update the EditText every time the slider's value is changed.
+			 */
 			@Override
 			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 				mWeightText.setText(progress / 10.0 + "");
 			}
 		});
-
-		mSave.setOnClickListener(this);
-
-		// add a click listener to the button
+		
 		mDateDisplay.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				showDialog(DATE_DIALOG_ID);
 			}
 		});
+		
 		mTimeDisplay.setOnClickListener(new View.OnClickListener() {
 
 			@Override
@@ -76,32 +83,37 @@ public class LogActivity extends Activity implements OnClickListener {
 				showDialog(TIME_DIALOG_ID);
 			}
 		});
-		// get the current date
-		// final Calendar c = Calendar.getInstance();
-		mDate = new GregorianCalendar();
-		mDate.setGregorianChange(new Date());
-		// display the current date (this method is below)
-		updateDisplay();
-
+		
 		mDateSetListener = new DatePickerDialog.OnDateSetListener() {
+			/**
+			 * Sets the date to what the user chose.
+			 */
 			public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
 				mDate.set(year, monthOfYear, dayOfMonth);
 				updateDisplay();
 			}
 		};
+		
 		mTimeSetListener = new TimePickerDialog.OnTimeSetListener() {
 
+			/**
+			 * Sets the time to what ever the user chose.
+			 */
 			@Override
 			public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-				// TODO Auto-generated method stub
 				mDate.set(GregorianCalendar.HOUR_OF_DAY, hourOfDay);
 				mDate.set(GregorianCalendar.MINUTE, minute);
 				updateDisplay();
 			}
 		};
-
+		
+		//Animation for going to and from this activity.
+		getWindow().setWindowAnimations(R.style.PauseDialogAnimation);
 	}
 
+	/**
+	 * Updates the text on the date button to the date object's time and day
+	 */
 	protected void updateDisplay() {
 		SimpleDateFormat formatter = new SimpleDateFormat("MMMMM d, yyyy");
 		mDateDisplay.setText(formatter.format(mDate.getTime()));
@@ -109,6 +121,9 @@ public class LogActivity extends Activity implements OnClickListener {
 		mTimeDisplay.setText(formatter.format(mDate.getTime()));
 	}
 
+	/**
+	 * Starts the time or date picker dialogs.
+	 */
 	@Override
 	protected Dialog onCreateDialog(int id) {
 		switch (id) {
@@ -122,7 +137,8 @@ public class LogActivity extends Activity implements OnClickListener {
 
 		case TIME_DIALOG_ID:
 			Dialog dialog1 = new TimePickerDialog(this, mTimeSetListener,
-					mDate.get(GregorianCalendar.HOUR_OF_DAY), mDate.get(GregorianCalendar.MINUTE), true);
+					mDate.get(GregorianCalendar.HOUR_OF_DAY), mDate.get(GregorianCalendar.MINUTE),
+					true);
 
 			dialog1.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
 			return dialog1;
@@ -130,6 +146,9 @@ public class LogActivity extends Activity implements OnClickListener {
 		return null;
 	}
 
+	/**
+	 * Saves the weight and time to the database.
+	 */
 	@Override
 	public void onClick(View v) {
 		if (v.equals(mSave)) {
@@ -145,6 +164,10 @@ public class LogActivity extends Activity implements OnClickListener {
 
 	}
 
+	/**
+	 * Creates the error messages.
+	 * @param resourceID the string to display for the error message
+	 */
 	protected void createError(int resourceID) {
 		AlertDialog.Builder errorMessage = new AlertDialog.Builder(this);
 		errorMessage.setTitle(R.string.error);
@@ -153,6 +176,9 @@ public class LogActivity extends Activity implements OnClickListener {
 		errorMessage.show();
 	}
 
+	/**
+	 * Sets the max number for the slider then fills in the previously filled in data.
+	 */
 	@Override
 	public void onResume() {
 		super.onResume();
@@ -164,6 +190,9 @@ public class LogActivity extends Activity implements OnClickListener {
 		fillInPrevious();
 	}
 
+	/**
+	 * Saves the weight information to the preferences
+	 */
 	@Override
 	public void onPause() {
 		super.onPause();
@@ -176,6 +205,9 @@ public class LogActivity extends Activity implements OnClickListener {
 
 	}
 
+	/**
+	 * Fills in the weight as the last value the user last put in there even if it was not saved by the user.
+	 */
 	protected void fillInPrevious() {
 		float lastWeight = Preferences.getLastWeight(this);
 		if (Preferences.getUnit(this).equals(WeightTime.Unit.POUND)) {

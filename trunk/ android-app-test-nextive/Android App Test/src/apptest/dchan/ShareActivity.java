@@ -181,6 +181,7 @@ public class ShareActivity extends Activity implements OnClickListener {
 			}
 			if (mShareLast.isChecked()) {
 				date2 = mEndingDate;
+				date2.add(GregorianCalendar.DAY_OF_MONTH, 1);
 			}
 			String[] finalEmailList = emailList.toArray(new String[emailList.size()]);
 

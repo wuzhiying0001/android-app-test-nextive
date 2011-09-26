@@ -44,6 +44,8 @@ public class ManageContactActivity extends Activity implements OnClickListener {
 
 		mCreateContact.setOnClickListener(this);
 		mChooseContact.setOnClickListener(this);
+
+		getWindow().setWindowAnimations(R.style.PauseDialogAnimation);
 	}
 
 	@Override
@@ -53,6 +55,10 @@ public class ManageContactActivity extends Activity implements OnClickListener {
 		populateTable();
 	}
 
+	/**
+	 * Gets all the default recipient contacts from the database and then makes
+	 * a row for each of them.
+	 */
 	private void populateTable() {
 		LinkedList<Contact> allEntries = DBHelper.getAllContacts(this);
 		for (Contact aRow : allEntries) {
@@ -60,6 +66,9 @@ public class ManageContactActivity extends Activity implements OnClickListener {
 		}
 	}
 
+	/**
+	 * Shows the delete contact from list menu. That is the only option.
+	 */
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 		super.onCreateContextMenu(menu, v, menuInfo);
@@ -71,6 +80,9 @@ public class ManageContactActivity extends Activity implements OnClickListener {
 		mClickedView = v;
 	}
 
+	/**
+	 * Deletes the selected contact from the database.
+	 */
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
 		if (item.getItemId() == DELETE_ACTION) {
@@ -104,20 +116,24 @@ public class ManageContactActivity extends Activity implements OnClickListener {
 		}
 	}
 
+	/**
+	 * Gets the name of the contact that was selected or created and returns it.
+	 */
 	private String getContactName(Intent data) {
 		Cursor cursor = null;
 		String contactName = getString(R.string.unknownName);
 		try {
 			Uri result = data.getData();
+
 			// get the contact id from the Uri
 			String id = result.getLastPathSegment();
 
-			String[] col = { Contacts.DISPLAY_NAME };
-			cursor = getContentResolver().query(Contacts.CONTENT_URI, col, Contacts._ID + "=?",
+			String[] columns = { Contacts.DISPLAY_NAME };
+			cursor = getContentResolver().query(Contacts.CONTENT_URI, columns, Contacts._ID + "=?",
 					new String[] { id }, null);
 
 			if (cursor.moveToNext()) {
-				contactName = cursor.getString(0);
+				contactName = cursor.getString(cursor.getColumnIndex(Contacts.DISPLAY_NAME));
 			}
 			cursor.close();
 		} catch (Exception e) {
@@ -125,6 +141,9 @@ public class ManageContactActivity extends Activity implements OnClickListener {
 		return contactName;
 	}
 
+	/** 
+	 * Gets a list of all the contact's email addresses.
+	 */
 	private LinkedList<String> getContactEmail(Intent data) {
 		Cursor cursor = null;
 		LinkedList<String> emails = new LinkedList<String>();
@@ -132,14 +151,13 @@ public class ManageContactActivity extends Activity implements OnClickListener {
 			Uri result = data.getData();
 			// get the contact id from the Uri
 			String id = result.getLastPathSegment();
-
+			String[] columns={Email.DATA};
 			// query for everything email
-			cursor = getContentResolver().query(Email.CONTENT_URI, null, Email.CONTACT_ID + "=?",
+			cursor = getContentResolver().query(Email.CONTENT_URI, columns, Email.CONTACT_ID + "=?",
 					new String[] { id }, null);
 
 			int emailIdx = cursor.getColumnIndex(Email.DATA);
 
-			// let's just get the first email
 			while (cursor.moveToNext()) {
 				emails.add(cursor.getString(emailIdx));
 			}
@@ -149,23 +167,28 @@ public class ManageContactActivity extends Activity implements OnClickListener {
 		return emails;
 	}
 
+	/**
+	 * Adds a row to the table for the contact's chosen email or show an error if the contact doesn't have one.
+	 * @param emailOptions email addresses of the contact
+	 * @param name name of the contact
+	 */
 	private void addMail(final String[] emailOptions, final String name) {
 		if (emailOptions.length > 1) {
 			final Context c = this;
 			AlertDialog.Builder chooseEmailDialog = new Builder(this);
+			//Shows an alert dialog that lets the user choose which email of the contact to use if they have more than 1.
 			chooseEmailDialog.setItems(emailOptions, new DialogInterface.OnClickListener() {
-
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					String chosenEmail = emailOptions[which];
 					DBHelper.addContact(c, new Contact(name, chosenEmail));
 					addContactRow(name, chosenEmail);
 				}
-
 			});
 			chooseEmailDialog.setTitle(R.string.chooseEmail);
 			chooseEmailDialog.show();
 		} else if (emailOptions.length == 1) {
+			//If they only have 1 email address then use that one.
 			String email = emailOptions[0];
 			DBHelper.addContact(this, new Contact(name, email));
 		} else {
@@ -181,6 +204,11 @@ public class ManageContactActivity extends Activity implements OnClickListener {
 		errorMessage.show();
 	}
 
+	/**
+	 * Adds a new row to the table.
+	 * @param _name Contact's name
+	 * @param _email Contact's email address
+	 */
 	private void addContactRow(String _name, String _email) {
 		LayoutInflater inflater = getLayoutInflater();
 		View myView = inflater.inflate(R.layout.contact_row, null);

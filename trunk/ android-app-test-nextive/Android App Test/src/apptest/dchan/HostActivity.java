@@ -13,18 +13,21 @@ public class HostActivity extends TabActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
+		// Checks to see if this is the first time the app has been opened. If
+		// it is then go to the settings page.
 		if (Preferences.isFirstTime(this)) {
 			Intent intent = new Intent(this, SettingsActivity.class);
 			startActivityForResult(intent, 0);
 		}
 
-		Resources res = getResources(); // Resource object to get Drawables
-		TabHost tabHost = getTabHost(); // The activity TabHost
-		TabHost.TabSpec spec; // Resusable TabSpec for each tab
-		Intent intent; // Reusable Intent for each tab
+		Resources res = getResources();
+		TabHost tabHost = getTabHost();
+		TabHost.TabSpec spec;
+		Intent intent;
 
-		// Create an Intent to launch an Activity for the tab (to be reused)
+		// Create an Intent to launch an Activity for the tab
 		intent = new Intent().setClass(this, LogActivity.class);
+
 		// Initialize a TabSpec for each tab and add it to the TabHost
 		spec = tabHost.newTabSpec("Log")
 				.setIndicator("Log", res.getDrawable(R.drawable.ic_tab_log)).setContent(intent);
@@ -52,6 +55,10 @@ public class HostActivity extends TabActivity {
 
 	}
 
+	/**
+	 * If the settings were not saved successfully on the first use then exit
+	 * the app.
+	 */
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (resultCode != RESULT_OK) {

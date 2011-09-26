@@ -28,6 +28,9 @@ public class HistoryActivity extends Activity {
 		mTable = (TableLayout) findViewById(R.id.historyTable);
 	}
 
+	/**
+	 * Removes everything from the table and then adds it back incase the user added more log entries in another activity.
+	 */
 	@Override
 	public void onResume() {
 		super.onResume();
@@ -35,6 +38,10 @@ public class HistoryActivity extends Activity {
 		populateTable();
 	}
 
+	/**
+	 * Gets all the weight time entries and then adds it to the table.  Each row is a history_row view.
+	 * Each row's id is the same is the database's row id for that entry.
+	 */
 	private void populateTable() {
 		LinkedList<WeightTime> allEntries = DBHelper.getWeightTime(this, null, null);
 		boolean kg = Preferences.getUnit(this).equals(WeightTime.Unit.KILOGRAM);
@@ -56,6 +63,9 @@ public class HistoryActivity extends Activity {
 		}
 	}
 
+	/**
+	 * The popup context menu.  Has two options, modify or delete the record.  The title of the menu is the date and weight of the row entry.
+	 */
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 		super.onCreateContextMenu(menu, v, menuInfo);
@@ -68,6 +78,10 @@ public class HistoryActivity extends Activity {
 		mClickedOnRow = v;
 	}
 
+	/**
+	 * If the selected action from the context menu is modify then the ModifyRecordActivity is started.  
+	 * The row id of the selected row is passed.  If delete is pressed, it will delete the entry from the database then remove that row's view.
+	 */
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
 		if (item.getItemId() == MODIFY_ACTION) {
