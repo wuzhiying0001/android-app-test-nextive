@@ -35,7 +35,7 @@
 	<string name="dateRange">Date Range:</string>
 	<string name="to">to</string>
 	<string name="custom">Custom</string>
-	<string name="emailSubject">Weight Information</string>
+	<string name="emailSubject">Weight Information for </string>
     <string name="addFromContact">Add from Contact</string>
     <string name="unknownName">Unknown Name</string>
     <string name="editContact">Edit Default Contacts</string>

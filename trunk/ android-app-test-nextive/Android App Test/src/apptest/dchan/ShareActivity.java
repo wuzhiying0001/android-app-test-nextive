@@ -53,12 +53,11 @@ public class ShareActivity extends Activity implements OnClickListener {
 
 		formatter = new SimpleDateFormat("MMMMM d, yyyy");
 
-
 		mShareButton.setOnClickListener(this);
 		mFirstDate.setOnClickListener(this);
 		mLastDate.setOnClickListener(this);
 		mCreateContactButton.setOnClickListener(this);
-		
+
 		// Hides or shows the beginning date selection button
 		mShareFirst.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
@@ -144,8 +143,11 @@ public class ShareActivity extends Activity implements OnClickListener {
 
 	/**
 	 * Creates the email's message body.
-	 * @param startDate the date of the earliest entry to get
-	 * @param endDate the date of the latest entry to get
+	 * 
+	 * @param startDate
+	 *            the date of the earliest entry to get
+	 * @param endDate
+	 *            the date of the latest entry to get
 	 * @return
 	 */
 	private String createMessage(GregorianCalendar startDate, GregorianCalendar endDate) {
@@ -167,13 +169,18 @@ public class ShareActivity extends Activity implements OnClickListener {
 		return message.toString();
 	}
 
-	private void sendEmail(String[] emailAddresses, String message) {
+	/**
+	 * Starts an email intent and puts in the email addresses, subject, and
+	 * message
+	 * @param emailAddresses
+	 * @param message
+	 */
+	private void sendEmail(String[] emailAddresses, String subject, String message) {
 		final Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
 
 		emailIntent.setType("plain/text");
 		emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, emailAddresses);
-		emailIntent
-				.putExtra(android.content.Intent.EXTRA_SUBJECT, getString(R.string.emailSubject));
+		emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, subject);
 		emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, message);
 
 		this.startActivity(Intent.createChooser(emailIntent, "Send mail..."));
@@ -184,11 +191,11 @@ public class ShareActivity extends Activity implements OnClickListener {
 		if (v.equals(mShareButton)) {
 			LinkedList<String> emailList = new LinkedList<String>();
 			if (mShareContact.isChecked()) {
-				//add all the default recipient's email addresses
+				// add all the default recipient's email addresses
 				emailList.addAll(DBHelper.getAllEmails(this));
 			}
 			if (mShareMyself.isChecked()) {
-				//add the user's email address
+				// add the user's email address
 				emailList.add(Preferences.getEmail(this));
 			}
 			GregorianCalendar date1 = null;
@@ -198,13 +205,16 @@ public class ShareActivity extends Activity implements OnClickListener {
 			}
 			if (mShareLast.isChecked()) {
 				date2 = mEndingDate;
-				//adding 1 day here so if the user puts in two exact same dates they still get the values for that day
+				// adding 1 day here so if the user puts in two exact same dates
+				// they still get the values for that day
 				date2.add(GregorianCalendar.DAY_OF_MONTH, 1);
 			}
-			//change the linked list of email address strings to an array of strings
+			// change the linked list of email address strings to an array of
+			// strings
 			String[] finalEmailList = emailList.toArray(new String[emailList.size()]);
 
-			sendEmail(finalEmailList, createMessage(date1, date2));
+			sendEmail(finalEmailList, getString(R.string.emailSubject) + Preferences.getName(this),
+					createMessage(date1, date2));
 
 		} else if (v.equals(mCreateContactButton)) {
 			Intent intent = new Intent(this, ManageContactActivity.class);
