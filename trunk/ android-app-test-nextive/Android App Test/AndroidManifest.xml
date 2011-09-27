@@ -19,7 +19,7 @@
 		<activity android:name="SettingsActivity" />
 		<activity android:name="CreateContactsActivity" />
 		<activity android:name="ModifyRecordActivity" />
-		<activity android:name="ContactAdder"/>
+        <activity android:name="ManageContactActivity"/>
 	</application>
 	<supports-screens android:resizeable="true"
 		android:smallScreens="true" android:normalScreens="true"

@@ -14,11 +14,15 @@ import android.util.Log;
 public class DBHelper extends SQLiteOpenHelper {
 	private final static String DBNAME = "weightAppDB";
 
+	//Table names
 	private final static String DATA_TABLE = "DATA";
 	private final static String CONTACT_TABLE = "CONTACTS";
 
+	//CONTACTS table columns
 	private final static String CONTACT_NAME = "CONTACT_NAME";
 	private final static String EMAIL_ADDRESS = "EMAIL_ADDRESS";
+	
+	//DATA table columns
 	private final static String DATE = "DATE_VALUE";
 	private final static String WEIGHT = "WEIGHT";
 	private final static String UNIT="UNIT";
@@ -29,11 +33,7 @@ public class DBHelper extends SQLiteOpenHelper {
 	public DBHelper(Context context, String dbName, int version) {
 		super(context, dbName, null, version);
 	}
-
-	/**
-	 * Called when the database has been opened. The implementation should check
-	 * isReadOnly() before updating the database.
-	 */
+	
 	@Override
 	public void onCreate(SQLiteDatabase db) {
 		try {
@@ -97,6 +97,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
 		Cursor cursor = db.query(DATA_TABLE, columns, selection, null, null, null, DATE);
 		while (cursor.moveToNext()) {
+			//Gets the information from teh cursor and creates a WeightTime object.  Adds the WeightTime object into the list
 			GregorianCalendar date = new GregorianCalendar();
 			date.setTimeInMillis(cursor.getLong(cursor.getColumnIndexOrThrow(DATE)));
 			float weight = cursor.getFloat(cursor.getColumnIndex(WEIGHT));

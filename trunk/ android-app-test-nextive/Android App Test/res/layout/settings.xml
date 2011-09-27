@@ -52,14 +52,6 @@
       android:layout_below="@+id/emailEditText"
       android:layout_alignParentLeft="true">
     </TextView>
-    <TextView
-      android:textAppearance="?android:attr/textAppearanceLarge"
-      android:layout_height="wrap_content"
-      android:layout_width="wrap_content"
-      android:id="@+id/defaultRecipientEmail"
-      android:layout_below="@+id/textView123"
-      android:layout_alignParentLeft="true">
-    </TextView>
     <Button
       android:text="@string/save"
       android:layout_height="wrap_content"
@@ -67,35 +59,19 @@
       android:id="@+id/saveButton"
       android:layout_alignParentBottom="true"
       android:layout_alignParentRight="true">
-    </Button>
-    <ToggleButton
-      android:layout_height="wrap_content"
-      android:textOn="@string/contact"
-      android:textOff="@string/contact"
-      android:id="@+id/contactDefaultContact"
-      android:layout_width="wrap_content"
-      android:layout_alignTop="@+id/myselfDefaultContact"
-      android:layout_toRightOf="@+id/myselfDefaultContact"></ToggleButton>
-    <ToggleButton
-      android:layout_height="wrap_content"
-      android:textOn="@string/myself"
-      android:textOff="@string/myself"
-      android:id="@+id/myselfDefaultContact"
-      android:layout_width="wrap_content"
-      android:layout_below="@+id/defaultRecipientEmail"
-      android:layout_alignParentLeft="true"></ToggleButton>
+    </Button> 
     <Button
-      android:text="@string/createNewContact"
+      android:text="@string/editContact"
       android:layout_height="wrap_content"
-      android:id="@+id/createNewContact"
+      android:id="@+id/editContacts"
       android:layout_width="wrap_content"
-      android:layout_alignTop="@+id/contactDefaultContact"
-      android:layout_toRightOf="@+id/contactDefaultContact"></Button>
+      android:layout_below="@+id/textView123"
+      ></Button>
     <RadioGroup
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:id="@+id/optionsGroup"
-      android:layout_below="@+id/createNewContact"
+      android:layout_below="@+id/editContacts"
       android:layout_alignParentLeft="true">
       <RadioButton
         android:layout_width="wrap_content"

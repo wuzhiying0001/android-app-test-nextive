@@ -21,7 +21,8 @@
 	<string name="contactName">Contact Name</string>
 	<string name="contactPhone">Contact Phone</string>
 	<string name="targetAccountLabel">Target Account</string>
-	<string name="phoneNumberFormatException">Only numbers are allowed for the phone number.</string>
+	<string name="phoneNumberFormatException">Only numbers, parentheses, and dashes are allowed for the phone number.</string>
+    <string name="emailFormatException">Not a valid email address.</string>
 	<string name="recordSaved">Record Saved</string>
 	<string name="createNewContact">Create New Contact</string>
 	<string name="myself">Myself</string>
@@ -35,5 +36,8 @@
 	<string name="to">to</string>
 	<string name="custom">Custom</string>
 	<string name="emailSubject">Weight Information</string>
-
+    <string name="addFromContact">Add from Contact</string>
+    <string name="unknownName">Unknown Name</string>
+    <string name="editContact">Edit Default Contacts</string>
+    <string name="chooseEmail">Choose email</string>
 </resources>

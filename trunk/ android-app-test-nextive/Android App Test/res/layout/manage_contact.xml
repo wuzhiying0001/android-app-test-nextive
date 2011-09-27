@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+  android:id="@+id/widget0"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  android:fillViewport="true"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+  <RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <TableLayout
+      android:id="@+id/contactTable"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_alignParentTop="true"
+      android:layout_above="@+id/linearLayout"
+      android:stretchColumns="1">
+    </TableLayout>
+    <LinearLayout 
+    android:id="@+id/linearLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_alignParentBottom="true"
+    android:orientation="horizontal">
+    <Button
+      android:id="@+id/createContactButton"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:text="@string/createNewContact"
+      android:layout_weight="1"/>
+    <Button
+      android:id="@+id/pickContactButton"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:text="@string/addFromContact"
+      android:layout_weight="1"></Button>
+      </LinearLayout>
+  </RelativeLayout>
+
+</ScrollView>
