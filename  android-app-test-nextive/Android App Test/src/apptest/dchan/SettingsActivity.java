@@ -34,14 +34,18 @@ public class SettingsActivity extends Activity implements OnClickListener {
 
 		mSaveButton.setOnClickListener(this);
 		mEditDefaultContact.setOnClickListener(this);
+		
+		loadPreferences();
 	}
 
 	@Override
 	public void onClick(View arg0) {
 		if (arg0.equals(mSaveButton)) {
 			if (!mEmailEditText.getText().toString().equals("")
-					&& !mNameEditText.getText().toString().equals("")) {
+					&& !mNameEditText.getText().toString().equals("") && mEmailEditText.getText().toString().contains("@")) {
 				savePreferences();
+				
+				//If its the first time the user has used this app
 				if (Preferences.isFirstTime(this)) {
 					Preferences.setFirstTime(this, false);
 					setResult(Activity.RESULT_OK);
@@ -50,8 +54,10 @@ public class SettingsActivity extends Activity implements OnClickListener {
 				Toast.makeText(this, R.string.recordSaved, Toast.LENGTH_LONG).show();
 			} else if (mNameEditText.getText().toString().equals("")) {
 				createError(R.string.email_missing);
-			} else {
+			} else if (mNameEditText.getText().toString().equals("")){
 				createError(R.string.name_missing);
+			} else {
+				createError(R.string.emailFormatException);
 			}
 		} else if (arg0.equals(mEditDefaultContact)) {
 			Intent intent = new Intent(this, ManageContactActivity.class);
@@ -60,6 +66,9 @@ public class SettingsActivity extends Activity implements OnClickListener {
 
 	}
 
+	/**
+	 * Saves the name, email address, and unit.
+	 */
 	private void savePreferences() {
 		Preferences.setName(this, mNameEditText.getText().toString());
 		Preferences.setEmail(this, mEmailEditText.getText().toString());
@@ -70,9 +79,10 @@ public class SettingsActivity extends Activity implements OnClickListener {
 		}
 	}
 
-	@Override
-	public void onResume() {
-		super.onResume();
+	/**
+	 * Loads the name, email address, and unit.
+	 */
+	private void loadPreferences() {
 		mNameEditText.setText(Preferences.getName(this));
 		mEmailEditText.setText(Preferences.getEmail(this));
 		if (Preferences.getUnit(this).equals(WeightTime.Unit.KILOGRAM)) {
