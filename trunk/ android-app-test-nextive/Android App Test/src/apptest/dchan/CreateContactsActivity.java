@@ -13,16 +13,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.provider.ContactsContract;
-import android.text.InputType;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.Toast;
-import android.widget.RelativeLayout.LayoutParams;
 import android.widget.Spinner;
 import android.widget.TableLayout;
 import apptest.dchan.R;
@@ -40,6 +38,7 @@ public final class CreateContactsActivity extends Activity implements OnClickLis
 	private Spinner mAccountSpinner;
 	private EditText mContactName;
 	private Account[] mAllAccouts;
+	private ContactInfo info;
 
 	/**
 	 * Called when the activity is first created. Responsible for initializing
@@ -81,16 +80,26 @@ public final class CreateContactsActivity extends Activity implements OnClickLis
 		mAllAccouts = AccountManager.get(this).getAccounts();
 
 		loadAccounts();
-		ContactInfo info = (ContactInfo) getLastNonConfigurationInstance();
-		if (info != null) {
-			loadRows(info);
-		}
-		
+
 		getWindow().setWindowAnimations(R.style.PauseDialogAnimation);
+		info = (ContactInfo) getLastNonConfigurationInstance();
+
 	}
 
 	/**
-	 * Called on rotation of the screen.
+	 * Loads the
+	 */
+	@Override
+	public void onResume() {
+		super.onResume();
+		if (info != null) {
+			loadRows(info);
+		}
+	}
+
+	/**
+	 * Called on rotation of the screen. Saves the currently entered contact
+	 * info to be loaded later.
 	 */
 	@Override
 	public Object onRetainNonConfigurationInstance() {
@@ -113,11 +122,11 @@ public final class CreateContactsActivity extends Activity implements OnClickLis
 	@Override
 	public void onClick(View v) {
 		if (v.equals(mPhoneAdd)) {
-			addPhoneRow();
+			addPhoneRow(-1, null);
 		} else if (v.equals(mPhoneMinus)) {
 			minusPhoneRow();
 		} else if (v.equals(mEmailAdd)) {
-			addEmailRow();
+			addEmailRow(-1, null);
 		} else if (v.equals(mEmailMinus)) {
 			minusEmailRow();
 		} else if (v.equals(mSaveButton)) {
@@ -127,9 +136,7 @@ public final class CreateContactsActivity extends Activity implements OnClickLis
 
 	/**
 	 * Finds an Account based on the name.
-	 * 
-	 * @param name
-	 *            the name that is used to search
+	 * @param name the name that is used to search
 	 * @return the account associated with the name or null if non is found
 	 */
 	private Account findAccount(String name) {
@@ -145,71 +152,19 @@ public final class CreateContactsActivity extends Activity implements OnClickLis
 	 */
 	private void save() {
 		ContactInfo info = saveRows();
-		String name = info.getName();
 		String accountName = info.getAccountName();
 		Account selectedAccount = findAccount(accountName);
 
-		// Prepare contact creation request
+		// Prepare contact creation request, adds the account information
 		ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
 		ops.add(ContentProviderOperation.newInsert(ContactsContract.RawContacts.CONTENT_URI)
 				.withValue(ContactsContract.RawContacts.ACCOUNT_TYPE, selectedAccount.type)
 				.withValue(ContactsContract.RawContacts.ACCOUNT_NAME, selectedAccount.name).build());
-		ops.add(ContentProviderOperation
-				.newInsert(ContactsContract.Data.CONTENT_URI)
-				.withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, 0)
-				.withValue(ContactsContract.Data.MIMETYPE,
-						ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE)
-				.withValue(ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME, name)
-				.build());
 
-		// Get an iterator for the list of phone types and numbers.
-		// Since they are added at the same time, when iterating through them,
-		// they should be for the same row.
-		LinkedList<Integer> contactPhoneType = info.getPhoneTypes();
-		LinkedList<String> contactPhoneNumbers = info.getPhoneNumbers();
-		Iterator<Integer> iter = contactPhoneType.iterator();
-		Iterator<String> iter1 = contactPhoneNumbers.iterator();
-		while (iter.hasNext() && iter1.hasNext()) {
-			int phoneType = mPhoneTypes.get(iter.next().intValue());
-			String phoneNumber=iter1.next();
+		ops = addNameInfo(ops, info);
+		ops = addPhoneInfo(ops, info);
+		ops = addEmailInfo(ops, info);
 
-			//If the text entered for phone number has weird characters then show and error and stop saving.
-			if(!checkPhoneNumber(phoneNumber))
-			{
-				showError(R.string.phoneNumberFormatException);
-				return;
-			}
-
-			// Adds the phone number and type to the ContentProviderOperation
-			ops.add(ContentProviderOperation
-					.newInsert(ContactsContract.Data.CONTENT_URI)
-					.withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, 0)
-					.withValue(ContactsContract.Data.MIMETYPE,
-							ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE)
-					.withValue(ContactsContract.CommonDataKinds.Phone.NUMBER, phoneNumber)
-					.withValue(ContactsContract.CommonDataKinds.Phone.TYPE, phoneType).build());
-		}
-		LinkedList<Integer> contactEmailTypes = info.getEmailType();
-		LinkedList<String> contactEmails = info.getEmails();
-		iter = contactEmailTypes.iterator();
-		iter1 = contactEmails.iterator();
-		while (iter.hasNext() && iter1.hasNext()) {
-			int emailType = mEmailTypes.get(iter.next().intValue());
-			String emailAddress = iter1.next();
-			
-			//Make sure the email text at least has an @ sign.
-			if (emailAddress.indexOf("@") < 0) {
-				showError(R.string.emailFormatException);
-				return;
-			}
-			ops.add(ContentProviderOperation
-					.newInsert(ContactsContract.Data.CONTENT_URI)
-					.withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, 0)
-					.withValue(ContactsContract.Data.MIMETYPE,
-							ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE)
-					.withValue(ContactsContract.CommonDataKinds.Email.DATA, emailAddress)
-					.withValue(ContactsContract.CommonDataKinds.Email.TYPE, emailType).build());
-		}
 		try {
 			ContentProviderResult[] asdf = getContentResolver().applyBatch(
 					ContactsContract.AUTHORITY, ops);
@@ -222,11 +177,101 @@ public final class CreateContactsActivity extends Activity implements OnClickLis
 	}
 
 	/**
-	 * Adds a row in the ui for the user to input a phone number and type into.
+	 * Adds the contacts name into the ContentProviderOperation.
+	 * @param ops ContentProviderOperation to add it to.
+	 * @return the ContentProviderOperation arraylist
 	 */
-	private void addPhoneRow() {
-		LinearLayout linearLayout = new LinearLayout(this);
+	private ArrayList<ContentProviderOperation> addNameInfo(
+			ArrayList<ContentProviderOperation> ops, ContactInfo info) {
+		ops.add(ContentProviderOperation
+				.newInsert(ContactsContract.Data.CONTENT_URI)
+				.withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, 0)
+				.withValue(ContactsContract.Data.MIMETYPE,
+						ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE)
+				.withValue(ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME,
+						info.getName()).build());
+		return ops;
+	}
 
+	/**
+	 * Adds the contacts email info into the ContentProviderOperation arraylist.
+	 * @param ops ContentProviderOperation to add it to.
+	 * @return the ContentProviderOperation arraylist or null if the email
+	 *         address entered didn't have an @ sign
+	 */
+	private ArrayList<ContentProviderOperation> addEmailInfo(
+			ArrayList<ContentProviderOperation> ops, ContactInfo info) {
+		LinkedList<Integer> contactEmailTypes = info.getEmailType();
+		LinkedList<String> contactEmails = info.getEmails();
+		Iterator<Integer> iter = contactEmailTypes.iterator();
+		Iterator<String> iter1 = contactEmails.iterator();
+		while (iter.hasNext() && iter1.hasNext()) {
+			int emailType = mEmailTypes.get(iter.next().intValue());
+			String emailAddress = iter1.next();
+
+			// Make sure the email text at least has an @ sign.
+			if (emailAddress.indexOf("@") < 0) {
+				showError(R.string.emailFormatException);
+				return null;
+			}
+			ops.add(ContentProviderOperation
+					.newInsert(ContactsContract.Data.CONTENT_URI)
+					.withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, 0)
+					.withValue(ContactsContract.Data.MIMETYPE,
+							ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE)
+					.withValue(ContactsContract.CommonDataKinds.Email.DATA, emailAddress)
+					.withValue(ContactsContract.CommonDataKinds.Email.TYPE, emailType).build());
+		}
+		return ops;
+	}
+
+	/**
+	 * Adds the contacts phone info into the ContentProviderOperation arraylist.
+	 * @param ops ContentProviderOperation to add it to.
+	 * @return the ContentProviderOperation arraylist or null if the entered
+	 *         phone number contained something other than numbers, dashes, or
+	 *         parentheses
+	 */
+	private ArrayList<ContentProviderOperation> addPhoneInfo(
+			ArrayList<ContentProviderOperation> ops, ContactInfo info) {
+		LinkedList<Integer> contactPhoneType = info.getPhoneTypes();
+		LinkedList<String> contactPhoneNumbers = info.getPhoneNumbers();
+		Iterator<Integer> iter = contactPhoneType.iterator();
+		Iterator<String> iter1 = contactPhoneNumbers.iterator();
+		while (iter.hasNext() && iter1.hasNext()) {
+			int phoneType = mPhoneTypes.get(iter.next().intValue());
+			String phoneNumber = iter1.next();
+
+			// If the text entered for phone number has weird characters then
+			// show and error and stop saving.
+			if (!checkPhoneNumber(phoneNumber)) {
+				showError(R.string.phoneNumberFormatException);
+				return null;
+			}
+
+			// Adds the phone number and type to the ContentProviderOperation
+			ops.add(ContentProviderOperation
+					.newInsert(ContactsContract.Data.CONTENT_URI)
+					.withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, 0)
+					.withValue(ContactsContract.Data.MIMETYPE,
+							ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE)
+					.withValue(ContactsContract.CommonDataKinds.Phone.NUMBER, phoneNumber)
+					.withValue(ContactsContract.CommonDataKinds.Phone.TYPE, phoneType).build());
+		}
+		return ops;
+	}
+
+	/**
+	 * Adds a row in the ui for the user to input a phone number and type into.
+	 * 
+	 * @param selection
+	 *            the position the phone number type spinner should be set to
+	 * @param phoneNumber
+	 *            the initial text in the edittext
+	 */
+	private void addPhoneRow(int selection, String phoneNumber) {
+		// Create and put values into the adapter for the types of phone
+		// numbers.
 		ArrayAdapter<String> adapter;
 		adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item);
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -236,17 +281,19 @@ public final class CreateContactsActivity extends Activity implements OnClickLis
 			adapter.add(contactType);
 		}
 
-		Spinner phoneSpinner = new Spinner(this);
-		phoneSpinner.setAdapter(adapter);
-		LayoutParams layoutParams = new LayoutParams(LayoutParams.MATCH_PARENT,
-				LayoutParams.WRAP_CONTENT);
+		LayoutInflater inflater = getLayoutInflater();
+		View myView = inflater.inflate(R.layout.phone_row, null);
+		Spinner phoneType = (Spinner) myView.findViewById(R.id.phoneType);
+		phoneType.setAdapter(adapter);
+		if (selection > -1) {
+			phoneType.setSelection(selection);
+		}
+		if (phoneNumber != null) {
+			EditText phoneNumberBox = (EditText) myView.findViewById(R.id.phoneNumber);
+			phoneNumberBox.setText(phoneNumber);
+		}
 
-		EditText et = new EditText(this);
-		et.setRawInputType(InputType.TYPE_CLASS_PHONE);
-		et.setLayoutParams(layoutParams);
-		linearLayout.addView(phoneSpinner);
-		linearLayout.addView(et);
-		mPhoneTable.addView(linearLayout);
+		mPhoneTable.addView(myView);
 	}
 
 	/**
@@ -258,11 +305,17 @@ public final class CreateContactsActivity extends Activity implements OnClickLis
 	}
 
 	/**
-	 * Adds a row in th ui for the user to input an email address and type into.
+	 * Adds a row in the ui for the user to input an email address and type
+	 * into.
+	 * 
+	 * @param selection
+	 *            the position the email address type spinner should be set to
+	 * @param emailAddress
+	 *            the initial text in the edittext
 	 */
-	private void addEmailRow() {
-		LinearLayout linearLayout = new LinearLayout(this);
-
+	private void addEmailRow(int selection, String emailAddress) {
+		// Create and put values into the adapter for the types of phone
+		// numbers.
 		ArrayAdapter<String> adapter;
 		adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item);
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -272,19 +325,20 @@ public final class CreateContactsActivity extends Activity implements OnClickLis
 			adapter.add(contactType);
 		}
 
-		Spinner emailSpinner = new Spinner(this);
-		emailSpinner.setAdapter(adapter);
+		LayoutInflater inflater = getLayoutInflater();
+		View myView = inflater.inflate(R.layout.email_row, null);
+		Spinner emailType = (Spinner) myView.findViewById(R.id.emailType);
+		emailType.setAdapter(adapter);
 
-		LayoutParams layoutParams = new LayoutParams(LayoutParams.MATCH_PARENT,
-				LayoutParams.WRAP_CONTENT);
+		if (selection > -1) {
+			emailType.setSelection(selection);
+		}
+		if (emailAddress != null) {
+			EditText emailBox = (EditText) myView.findViewById(R.id.emailAddress);
+			emailBox.setText(emailAddress);
+		}
 
-		EditText et = new EditText(this);
-		et.setRawInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
-		et.setLayoutParams(layoutParams);
-
-		linearLayout.addView(emailSpinner);
-		linearLayout.addView(et);
-		mEmailTable.addView(linearLayout);
+		mEmailTable.addView(myView);
 	}
 
 	/**
@@ -305,32 +359,23 @@ public final class CreateContactsActivity extends Activity implements OnClickLis
 
 		mContactName.setText(info.getName());
 		mAccountSpinner.setSelection(info.getSelectedAccount());
+
+		// Load the previously entered phone numbers
 		LinkedList<Integer> phoneType = info.getPhoneTypes();
 		LinkedList<String> phoneNumber = info.getPhoneNumbers();
-		Iterator<Integer> i = phoneType.iterator();
-		Iterator<String> i1 = phoneNumber.iterator();
-		while (i.hasNext() && i1.hasNext()) {
-			addPhoneRow();
-			LinearLayout zxcv = (LinearLayout) mPhoneTable
-					.getChildAt(mPhoneTable.getChildCount() - 1);
-			Spinner phoneSpinner = (Spinner) zxcv.getChildAt(0);
-			phoneSpinner.setSelection(i.next());
-			EditText phone = (EditText) zxcv.getChildAt(1);
-			phone.setText(i1.next());
+		Iterator<Integer> typeIterator = phoneType.iterator();
+		Iterator<String> valueIterator = phoneNumber.iterator();
+		while (typeIterator.hasNext() && valueIterator.hasNext()) {
+			addPhoneRow(typeIterator.next(), valueIterator.next());
 		}
 
+		// Load the previously entered emails
 		LinkedList<Integer> emailType = info.getEmailType();
 		LinkedList<String> emails = info.getEmails();
-		i = emailType.iterator();
-		i1 = emails.iterator();
-		while (i.hasNext() && i1.hasNext()) {
-			addEmailRow();
-			LinearLayout zxcv = (LinearLayout) mEmailTable
-					.getChildAt(mEmailTable.getChildCount() - 1);
-			Spinner emailSpinner = (Spinner) zxcv.getChildAt(0);
-			emailSpinner.setSelection(i.next());
-			EditText emailAddress = (EditText) zxcv.getChildAt(1);
-			emailAddress.setText(i1.next());
+		typeIterator = emailType.iterator();
+		valueIterator = emails.iterator();
+		while (typeIterator.hasNext() && valueIterator.hasNext()) {
+			addEmailRow(typeIterator.next(), valueIterator.next());
 		}
 
 	}
@@ -350,20 +395,22 @@ public final class CreateContactsActivity extends Activity implements OnClickLis
 		// Get each email row's email type and email address and add it to the
 		// ContactInfo object.
 		for (int i = 0; i < mEmailTable.getChildCount(); i++) {
-			LinearLayout zxcv = (LinearLayout) mEmailTable.getChildAt(i);
-			Spinner emailSpinner = (Spinner) zxcv.getChildAt(0);
+			View view = mEmailTable.getChildAt(i);
+			Spinner emailSpinner = (Spinner) view.findViewById(R.id.emailType);
 			int emailType = emailSpinner.getSelectedItemPosition();
-			String emailAddress = ((EditText) zxcv.getChildAt(1)).getText().toString();
+			String emailAddress = ((EditText) view.findViewById(R.id.emailAddress)).getText()
+					.toString();
 			info.addEmail(emailType, emailAddress);
 		}
 
 		// Get each phone row's phone type and phone number and add it to the
 		// contact info object.
 		for (int i = 0; i < mPhoneTable.getChildCount(); i++) {
-			LinearLayout zxcv = (LinearLayout) mPhoneTable.getChildAt(i);
-			Spinner phoneSpinner = (Spinner) zxcv.getChildAt(0);
+			View view = mPhoneTable.getChildAt(i);
+			Spinner phoneSpinner = (Spinner) view.findViewById(R.id.phoneType);
 			int phoneType = phoneSpinner.getSelectedItemPosition();
-			String phoneNumber = ((EditText) zxcv.getChildAt(1)).getText().toString();
+			String phoneNumber = ((EditText) view.findViewById(R.id.phoneNumber)).getText()
+					.toString();
 			info.addPhone(phoneType, phoneNumber);
 		}
 		return info;
@@ -382,8 +429,10 @@ public final class CreateContactsActivity extends Activity implements OnClickLis
 
 	/**
 	 * Checks to see if a string only has numbers, parentheses, or dashes
+	 * 
 	 * @param str
-	 * @return
+	 *            the string to check
+	 * @return true if it validates otherwise false.
 	 */
 	private boolean checkPhoneNumber(String str) {
 		// It can't contain only numbers if it's null or empty...
@@ -393,13 +442,20 @@ public final class CreateContactsActivity extends Activity implements OnClickLis
 		for (int i = 0; i < str.length(); i++) {
 
 			// If we find a non-digit character we return false.
-			char character=str.charAt(i);
-			if (!Character.isDigit(character) && character!='(' &&  character!=')' && character!='-')
+			char character = str.charAt(i);
+			if (!Character.isDigit(character) && character != '(' && character != ')'
+					&& character != '-')
 				return false;
 		}
 		return true;
 	}
 
+	/**
+	 * Used to store the contact's information
+	 * 
+	 * @author Danny
+	 * 
+	 */
 	private class ContactInfo {
 		private String mContactName;
 		private int mSelectedAccount;

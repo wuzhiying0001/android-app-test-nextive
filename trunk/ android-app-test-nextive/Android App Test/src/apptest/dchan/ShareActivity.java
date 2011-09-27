@@ -29,7 +29,7 @@ public class ShareActivity extends Activity implements OnClickListener {
 	private ToggleButton mShareLast;
 	private GregorianCalendar mBeginningDate;
 	private GregorianCalendar mEndingDate;
-
+	private SimpleDateFormat formatter;
 	private DatePickerDialog.OnDateSetListener beginngDateListener;
 	private DatePickerDialog.OnDateSetListener enddingDateListener;
 
@@ -51,6 +51,15 @@ public class ShareActivity extends Activity implements OnClickListener {
 		mShareFirst = (ToggleButton) findViewById(R.id.firstDateToggleButton);
 		mShareLast = (ToggleButton) findViewById(R.id.lastDateToggleButton);
 
+		formatter = new SimpleDateFormat("MMMMM d, yyyy");
+
+
+		mShareButton.setOnClickListener(this);
+		mFirstDate.setOnClickListener(this);
+		mLastDate.setOnClickListener(this);
+		mCreateContactButton.setOnClickListener(this);
+		
+		// Hides or shows the beginning date selection button
 		mShareFirst.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
 			@Override
@@ -62,6 +71,7 @@ public class ShareActivity extends Activity implements OnClickListener {
 			}
 		});
 
+		// Hides or shows the ending date selection button
 		mShareLast.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
 			@Override
@@ -73,17 +83,13 @@ public class ShareActivity extends Activity implements OnClickListener {
 			}
 		});
 
-		mShareButton.setOnClickListener(this);
-		mFirstDate.setOnClickListener(this);
-		mLastDate.setOnClickListener(this);
-		mCreateContactButton.setOnClickListener(this);
-
 		mBeginningDate = DBHelper.getFirstEntryDate(this);
 		if (mBeginningDate == null) {
 			mBeginningDate = new GregorianCalendar(2000, 1, 1);
 		}
 		mEndingDate = new GregorianCalendar();
 
+		// changes the beginning date based on what the user has picked
 		beginngDateListener = new DatePickerDialog.OnDateSetListener() {
 			public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
 				mBeginningDate.set(year, monthOfYear, dayOfMonth);
@@ -91,6 +97,7 @@ public class ShareActivity extends Activity implements OnClickListener {
 			}
 		};
 
+		// changes the ending date based on what the user has picked
 		enddingDateListener = new DatePickerDialog.OnDateSetListener() {
 			public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
 				mEndingDate.set(year, monthOfYear, dayOfMonth);
@@ -102,6 +109,9 @@ public class ShareActivity extends Activity implements OnClickListener {
 		updateEndingDate();
 	}
 
+	/**
+	 * See which date picker button was pressed to show a different date.
+	 */
 	@Override
 	protected Dialog onCreateDialog(int id) {
 		switch (id) {
@@ -125,15 +135,19 @@ public class ShareActivity extends Activity implements OnClickListener {
 	}
 
 	private void updateBeginningDate() {
-		SimpleDateFormat formatter = new SimpleDateFormat("MMMMM d, yyyy");
 		mFirstDate.setText(formatter.format(mBeginningDate.getTime()));
 	}
 
 	private void updateEndingDate() {
-		SimpleDateFormat formatter = new SimpleDateFormat("MMMMM d, yyyy");
 		mLastDate.setText(formatter.format(mEndingDate.getTime()));
 	}
 
+	/**
+	 * Creates the email's message body.
+	 * @param startDate the date of the earliest entry to get
+	 * @param endDate the date of the latest entry to get
+	 * @return
+	 */
 	private String createMessage(GregorianCalendar startDate, GregorianCalendar endDate) {
 		SimpleDateFormat formatter = new SimpleDateFormat("MMMMM d, yyyy hh:mm a");
 		WeightTime.Unit unit = Preferences.getUnit(this);
@@ -158,9 +172,10 @@ public class ShareActivity extends Activity implements OnClickListener {
 
 		emailIntent.setType("plain/text");
 		emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, emailAddresses);
-		emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, getString(R.string.emailSubject));
+		emailIntent
+				.putExtra(android.content.Intent.EXTRA_SUBJECT, getString(R.string.emailSubject));
 		emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, message);
-		
+
 		this.startActivity(Intent.createChooser(emailIntent, "Send mail..."));
 	}
 
@@ -169,9 +184,11 @@ public class ShareActivity extends Activity implements OnClickListener {
 		if (v.equals(mShareButton)) {
 			LinkedList<String> emailList = new LinkedList<String>();
 			if (mShareContact.isChecked()) {
+				//add all the default recipient's email addresses
 				emailList.addAll(DBHelper.getAllEmails(this));
 			}
 			if (mShareMyself.isChecked()) {
+				//add the user's email address
 				emailList.add(Preferences.getEmail(this));
 			}
 			GregorianCalendar date1 = null;
@@ -181,8 +198,10 @@ public class ShareActivity extends Activity implements OnClickListener {
 			}
 			if (mShareLast.isChecked()) {
 				date2 = mEndingDate;
+				//adding 1 day here so if the user puts in two exact same dates they still get the values for that day
 				date2.add(GregorianCalendar.DAY_OF_MONTH, 1);
 			}
+			//change the linked list of email address strings to an array of strings
 			String[] finalEmailList = emailList.toArray(new String[emailList.size()]);
 
 			sendEmail(finalEmailList, createMessage(date1, date2));

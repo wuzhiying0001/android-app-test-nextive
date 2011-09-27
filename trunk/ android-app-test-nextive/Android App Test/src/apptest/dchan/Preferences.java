@@ -3,6 +3,10 @@ package apptest.dchan;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+/**
+ * Class to set and get preferences.
+ *
+ */
 public class Preferences {
 	public final static String UNIT="UNIT";
 	public final static String LAST_WEIGHT="WEIGHT";

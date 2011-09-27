@@ -2,7 +2,6 @@ package apptest.dchan;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.GregorianCalendar;
 
 import android.app.Activity;
@@ -196,11 +195,15 @@ public class LogActivity extends Activity implements OnClickListener {
 	@Override
 	public void onPause() {
 		super.onPause();
-		float lastEnteredWeight = Float.parseFloat(mWeightText.getText().toString());
-		if (Preferences.getUnit(this).equals(WeightTime.Unit.POUND)) {
-			Preferences.setLastWeight(this, WeightTime.lbsToKgs(lastEnteredWeight));
-		} else {
-			Preferences.setLastWeight(this, lastEnteredWeight);
+		try {
+			float lastEnteredWeight = Float.parseFloat(mWeightText.getText().toString());
+			if (Preferences.getUnit(this).equals(WeightTime.Unit.POUND)) {
+				Preferences.setLastWeight(this, WeightTime.lbsToKgs(lastEnteredWeight));
+			} else {
+				Preferences.setLastWeight(this, lastEnteredWeight);
+			}
+		} catch (NumberFormatException e) {
+			createError(R.string.weight_number);
 		}
 
 	}

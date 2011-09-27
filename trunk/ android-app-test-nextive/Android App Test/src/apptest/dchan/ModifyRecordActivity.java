@@ -21,9 +21,14 @@ public class ModifyRecordActivity extends LogActivity {
 				finish();
 			}
 		});
+		
+		//Get the row id of the record to edit
 		mRecordId = getIntent().getIntExtra(DBHelper.UID, -1);
 	}
 
+	/**
+	 * Fills in the information for the record to be edited
+	 */
 	@Override
 	protected void fillInPrevious() {
 		WeightTime wt = DBHelper.getRow(this, mRecordId);
@@ -40,10 +45,12 @@ public class ModifyRecordActivity extends LogActivity {
 		updateDisplay();
 	}
 
+	
 	@Override
 	public void onClick(View v) {
 		if (v.equals(mSave)) {
 			try {
+				//Save the weight and date and then save it to the database
 				float weight = Float.parseFloat(mWeightText.getText().toString());
 
 				WeightTime wt = new WeightTime(mDate, weight, Preferences.getUnit(this));
@@ -55,11 +62,5 @@ public class ModifyRecordActivity extends LogActivity {
 				createError(R.string.weight_number);
 			}
 		}
-	}
-
-	@Override
-	public void onBackPressed() {
-		super.onBackPressed();
-		finish();
 	}
 }
